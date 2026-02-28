@@ -79,7 +79,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, watchEffect, nextTick, onMounted } from 'vue';
+import { ref, computed, reactive, watch, watchEffect, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   FONT_COLOR_1,
@@ -194,6 +194,8 @@ const menuItems = computed(() => {
   }));
 });
 
+
+
 const onClickParentMenu = (index, menuItem, isParentGroupClick = false) => {
   const hasSubItems = menuItem.menuType === 'SUB_MENU_ITEMS' && menuItem.sub_menu_items && menuItem.sub_menu_items.length > 0;
 
@@ -242,7 +244,7 @@ const onClickParentMenu = (index, menuItem, isParentGroupClick = false) => {
       window.open(menuItem.menu_item_external_url, "_blank");
     }
     else if (menuItem.id) {
-      // This is default case for all other standard menu items.
+      // This is the default case for all other standard menu items.
       router.push({ path: `/menu/${menuItem.id}` });
     }
     // --- END: RESTRUCTURED LOGIC ---
@@ -344,19 +346,8 @@ const getIconUrl = (menuItem, isSubItem = false) => {
   return '';
 };
 
-// SIMPLE FOCUS MANAGEMENT
-onMounted(() => {
-  nextTick(() => {
-    setTimeout(() => {
-        // Focus first menu item when navigation drawer opens
-        const firstMenuItem = document.querySelector('.v-list-item.focusable-item');
-        if (firstMenuItem && showMenuBar.value) {
-          firstMenuItem.focus();
-        }
-      }, 300);
-  });
-});
 
+// ... (watchEffect for currentRoute and watch for router.currentRoute.value.fullPath remain the same)
 watchEffect(() => {
   const routeParams = router.currentRoute.value.params;
   let newRouteId = routeParams.subMenuId || routeParams.menuId;
@@ -368,7 +359,7 @@ watchEffect(() => {
     currentRoute.value = String(menuItems.value[0].id);
   }
 
-  // SIMPLE FOCUS RESET
+  // Ensure focus is properly set after menu updates
   nextTick(() => {
     setTimeout(() => {
       webOSFocusManager.refreshSpatialNavigation(100);
