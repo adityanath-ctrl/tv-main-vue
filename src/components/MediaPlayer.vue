@@ -197,7 +197,8 @@
                   <div
                     v-for="ev in (streamGroups[activeStreamGroup]?.items || [])"
                     :key="ev.live_event_id"
-                    class="list-row"
+                    class="list-row focusable-item"
+                    tabindex="0"
                     :class="{ 'is-active': isSelected(ev) }"
                     @click="emitSelectEvent(ev)"
                   >
@@ -234,7 +235,8 @@
                   <div
                     v-for="ev in (videoGroups[activeVideoGroup]?.items || [])"
                     :key="ev.live_event_id"
-                    class="list-row"
+                    class="list-row focusable-item"
+                    tabindex="0"
                     :class="{ 'is-active': isSelected(ev) }"
                     @click="emitSelectEvent(ev)"
                   >

@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column bg-none w-100" :class="[isViewMore ? 'py-3' : 'pb-10 pt-2']" @click="handleCardClick()"
+  <div class="d-flex flex-column bg-none w-100 focusable-item" tabindex="0" :class="[isViewMore ? 'py-3' : 'pb-10 pt-2']" @click="handleCardClick()"
     style="cursor: pointer">
     <div class="slider-img-container">
       <img class="card-img" :src="EPG.icon_poster" />

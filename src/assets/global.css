@@ -121,4 +121,34 @@ body.lock-scroll {
   transition: transform 0.1s ease-out;
 }
 
+/* TV Spatial Navigation Focus Styles */
+:focus,
+.v-btn:focus,
+.v-list-item:focus,
+.v-tab:focus,
+.swiper-slide:focus,
+a:focus,
+button:focus,
+[tabindex]:focus,
+.focusable:focus {
+  outline: 4px solid #BB2025 !important;
+  outline-offset: -2px !important;
+  box-shadow: 0 0 15px rgba(187, 32, 37, 0.8) !important;
+  transform: scale(1.03);
+  transition: all 0.2s ease-in-out;
+  z-index: 100;
+  border-radius: inherit;
+}
 
+/* Turn off outline for the container inputs themselves to avoid double-boxing */
+.v-input:focus {
+  transform: none;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Media Player internal buttons */
+.rmp-button:focus, .rmp-container:focus {
+  outline-color: #FFF !important;
+  box-shadow: 0 0 10px #FFF !important;
+}

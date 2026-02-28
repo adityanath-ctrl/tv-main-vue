@@ -10,7 +10,7 @@
           v-if="menuItem.menuType === 'SUB_MENU_ITEMS' && menuItem.sub_menu_items && menuItem.sub_menu_items.length > 0"
           :value="menuItem.id">
           <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" :prepend-avatar="getIconUrl(menuItem)" class="mb-3"
+            <v-list-item v-bind="props" :prepend-avatar="getIconUrl(menuItem)" class="mb-3 focusable-item" tabindex="0"
               :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
               @click="onClickParentMenu(index, menuItem, true)" :title="menuItem?.menuItemName">
             </v-list-item>
@@ -18,13 +18,14 @@
 
           <v-list-item v-for="(subItem, subIndex) in menuItem.sub_menu_items" :key="subItem.id"
             :prepend-avatar="getIconUrl(subItem, true)"
+            class="custom-sub-menu-item focusable-item"
+            tabindex="0"
             :style="currentRoute == subItem.id ? activeItemStyle : inActiveItemStyle"
-            @click="onClickSubMenu(index, subIndex, subItem)" :title="subItem?.subMenuName"
-            class="custom-sub-menu-item">
+            @click="onClickSubMenu(index, subIndex, subItem)" :title="subItem?.subMenuName">
           </v-list-item>
         </v-list-group>
 
-        <v-list-item v-else :key="menuItem.id + '_single'" :prepend-avatar="getIconUrl(menuItem)" class="mb-3"
+        <v-list-item v-else :key="menuItem.id + '_single'" :prepend-avatar="getIconUrl(menuItem)" class="mb-3 focusable-item" tabindex="0"
           :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
           @click="onClickParentMenu(index, menuItem, false)">
           <v-list-item-title>
@@ -129,6 +130,7 @@ const backgroundStyle_hide = reactive({
   width: "0vw",
   paddingRight: "6px",
   transform: "translateX(-2000%)!important",
+  visibility: "hidden",
 });
 
 const backgroundStyle_show = reactive({

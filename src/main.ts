@@ -13,6 +13,7 @@ import { EventType, type AuthenticationResult } from '@azure/msal-browser';
 import { CustomNavigationClient } from './router/NavigationClient';
 import useAuthStore from './store/useAuthStore';
 import { changeTimeFormatEST } from './utils/date';
+import { initTVControls } from './tvControls';
 
 // ——— GLOBAL SWIPER SETUP ———
 import Swiper from 'swiper';
@@ -67,7 +68,7 @@ app.use(msalPlugin, msalInstance);
 async function initializeAppAuthentication() {
   authStore.setMsalInstance(msalInstance);
 
-   // Check the URL for the special 'token' parameter BEFORE any other auth logic.
+  // Check the URL for the special 'token' parameter BEFORE any other auth logic.
   const urlParams = new URLSearchParams(window.location.search);
   const tokenFromUrl = urlParams.get('token');
 
@@ -106,4 +107,7 @@ async function initializeAppAuthentication() {
 router.isReady().then(async () => {
   await initializeAppAuthentication();
   app.mount('#app');
+
+  // Start TV Remote Control mappings
+  initTVControls();
 });
