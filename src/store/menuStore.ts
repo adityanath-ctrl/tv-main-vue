@@ -1,5 +1,5 @@
-import {ActionContext} from 'vuex'
-import MainMenuTypes from '../types/menuType';
+import { type ActionContext   } from 'vuex'
+import type MainMenuTypes from '../types/menuType';
 
 
 export const MenuStore = {

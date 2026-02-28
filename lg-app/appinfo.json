@@ -1,0 +1,15 @@
+{
+    "id": "sr.telesurplus.webos",
+    "version": "1.0.33",
+    "vendor": "Telesur",
+    "type": "web",
+    "main": "index.html",
+    "title": "Telesur+",
+    "icon": "icon.png",
+    "largeIcon": "largeIcon.png",
+    "uiRevision": 2,
+    "resolution": "1920x1080",
+    "transparent": false,
+    "requiredMemory": 100,
+    "disableBackHistoryAPI": false
+}

@@ -1,5 +1,5 @@
-import { ActionContext } from 'vuex' 
-import AccountType from '@/types/accountType';
+import { type ActionContext   } from 'vuex' 
+import type AccountType from '@/types/accountType';
 
 export const AccountStore = {
   state: {

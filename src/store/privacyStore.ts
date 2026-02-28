@@ -1,8 +1,12 @@
-import { ActionContext } from 'vuex'
+import { type ActionContext   } from 'vuex'
 import createPersistedState from "vuex-persistedstate";
-import Auth from '../types/authType'
+import type Auth from '../types/authType'
 
 
+
+interface PrivacyState {
+  auth: Auth;
+}
 
 export const PrivacyStore = {
   state: {
@@ -10,21 +14,21 @@ export const PrivacyStore = {
       loggedIn: false,
       msalToken: '',
     }
-    
+
   },
   getters: {
-    getPrivacyStore(state: Auth): Auth{
+    getPrivacyStore(state: PrivacyState): PrivacyState {
       return state;
-    } 
+    }
   },
-  actions: { 
-    setPrivacyStore(context: ActionContext<Auth, Auth>, data: Auth): void{
+  actions: {
+    setPrivacyStore(context: ActionContext<PrivacyState, any>, data: Auth): void {
       context.commit('setPrivacyStore', data);
     }
   },
   mutations: {
-    setPrivacyStore(state: Auth, data: Auth): void{
-      state.auth = data; 
+    setPrivacyStore(state: PrivacyState, data: Auth): void {
+      state.auth = data;
     }
   },
   plugins: [
@@ -35,5 +39,5 @@ export const PrivacyStore = {
     //   }
     // })
   ],
-  
+
 }

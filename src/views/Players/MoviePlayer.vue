@@ -130,7 +130,7 @@ const viewportStyle = computed(() => {
 /* ---------- Radiant single-init and sizing ---------- */
 let rmp = null;
 let lastSrcKey = '';
-const RMP_SCRIPT_URL = '/radiantmediaplayer/rmp.min.js';
+const RMP_SCRIPT_URL = './radiantmediaplayer/rmp.min.js';
 let radiantLoader = null;
 
 function ensureRadiant() {
@@ -185,7 +185,7 @@ function buildSettings(src, widthPx, heightPx) {
     '';
   return {
     licenseKey: RADIANTMEDIAPLAYER_LICENCE_KEY,
-    pathToRmpFiles: '/radiantmediaplayer/',
+    pathToRmpFiles: './radiantmediaplayer/',
     skin: 's2',
     autoplay: true,
     autoHeightMode: false,

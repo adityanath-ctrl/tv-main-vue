@@ -1,5 +1,5 @@
-import { ActionContext } from 'vuex'
-import { getSearchData } from '../utils/siberapi'
+import { type ActionContext   } from 'vuex'
+import { getSearchData } from '../utils/siberAPI'
 
 export const SearchStore = {
   state: {

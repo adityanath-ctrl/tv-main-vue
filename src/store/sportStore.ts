@@ -1,5 +1,5 @@
-import { ActionContext } from 'vuex'
-import { getSportsByCategory } from '../utils/siberapi'
+import { type ActionContext  } from 'vuex'
+import { getSportsByCategory } from '../utils/siberAPI'
 
 export const SportStore = {
   state: {
@@ -10,7 +10,7 @@ export const SportStore = {
       let auth = context.getters.getAuth
       let apiParams = {
         token: auth.auth.msalToken,
-        category_id: Number(payload.CategoryId),
+        category_id: String(payload.CategoryId),
       }
 
       getSportsByCategory(apiParams).then((res) => {

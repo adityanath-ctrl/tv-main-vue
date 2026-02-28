@@ -1,9 +1,9 @@
-import { ActionContext } from 'vuex'
+import { type ActionContext   } from 'vuex'
 import {
   getChannelCategories,
   getEPGTime,
   getChannels,
-} from '../utils/siberapi'
+} from '../utils/siberAPI'
 
 export const EPGStore = {
   state: {

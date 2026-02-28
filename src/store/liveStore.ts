@@ -1,9 +1,9 @@
-import { ActionContext } from 'vuex'
+import { type ActionContext   } from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
-import Auth from '../types/authType'
-import TVChannel from '@/types/tvChannelType'
-import TVCategory from '@/types/tvCategoriesType'
-import { getLiveTVByCategoryId, getEPGNowTime } from '../utils/siberapi'
+import type Auth from '../types/authType'
+import type TVChannel from '@/types/tvChannelType'
+import type TVCategory from '@/types/tvCategoriesType'
+import { getLiveTVByCategoryId, getEPGNowTime } from '../utils/siberAPI'
 
 export const LiveStore = {
   state: {
@@ -65,7 +65,7 @@ export const LiveStore = {
       let auth = context.getters.getAuth
       let apiParams = {
         token: auth.auth.msalToken,
-        category_id: Number(playload.CategoryId),
+        category_id: String(playload.CategoryId),
       }
 
       getLiveTVByCategoryId(apiParams).then((res) => {

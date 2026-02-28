@@ -1,8 +1,12 @@
-import { ActionContext } from 'vuex'
+import { type ActionContext } from 'vuex'
 import createPersistedState from "vuex-persistedstate";
-import Auth from '../types/authType'
+import type Auth from '../types/authType'
 
 
+
+interface DeviceState {
+  auth: Auth;
+}
 
 export const DeviceStore = {
   state: {
@@ -10,21 +14,21 @@ export const DeviceStore = {
       loggedIn: false,
       msalToken: '',
     }
-    
+
   },
   getters: {
-    getDeviceStore(state: Auth): Auth{
+    getDeviceStore(state: DeviceState): DeviceState {
       return state;
-    } 
+    }
   },
-  actions: { 
-    setDeviceStore(context: ActionContext<Auth, Auth>, data: Auth): void{
+  actions: {
+    setDeviceStore(context: ActionContext<DeviceState, any>, data: Auth): void {
       context.commit('setDeviceStore', data);
     }
   },
   mutations: {
-    setDeviceStore(state: Auth, data: Auth): void{
-      state.auth = data; 
+    setDeviceStore(state: DeviceState, data: Auth): void {
+      state.auth = data;
     }
   },
   plugins: [
@@ -35,5 +39,5 @@ export const DeviceStore = {
     //   }
     // })
   ],
-  
+
 }

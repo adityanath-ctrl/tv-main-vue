@@ -1,16 +1,15 @@
-import { ActionContext } from 'vuex'
+import { type ActionContext  } from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
-import Auth from '../types/authType'
-import EventPackagesType from '@/types/eventPackageType'
-import EventsType from '@/types/eventType'
+import type Auth from '../types/authType'
+import type EventPackagesType from '@/types/eventPackageType'
+import type EventsType from '@/types/eventType'
 import {
   getGuestToken,
   getSVODByCategoryId,
   getSVODById,
   getSVODSeriesById,
-  tokenExpired,
-} from '../utils/siberapi'
-import { pl } from 'element-plus/es/locale'
+  isTokenExpired,
+} from '../utils/siberAPI'
 
 export const SVODStore = {
   state: {
@@ -58,7 +57,7 @@ export const SVODStore = {
       if (token == '') {
         token = localStorage.getItem('authToken') || ''
       }
-      if (tokenExpired(token) || auth.auth.tokenMode == 'guest') {
+      if (isTokenExpired(token) || auth.auth.tokenMode == 'guest') {
         getGuestToken().then((value: any) => {
           let apiParams = {
             token: value.data.access_token,
@@ -92,7 +91,7 @@ export const SVODStore = {
       if (token == '') {
         token = localStorage.getItem('authToken') || ''
       }
-      if (tokenExpired(token) || auth.auth.tokenMode == 'guest') {
+      if (isTokenExpired(token) || auth.auth.tokenMode == 'guest') {
         getGuestToken().then((value: any) => {
           let apiParams = {
             token: value.data.access_token,

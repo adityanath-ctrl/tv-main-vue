@@ -2,17 +2,34 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-// import fs from 'fs'
+import legacy from '@vitejs/plugin-legacy'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
+  base: './',
+  plugins: [
+    vue(),
+    legacy({
+      targets: ['chrome >= 53', 'not IE 11'],
+      polyfills: true
+    })
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-
+  build: {
+    target: 'chrome53', // WebOS 4 and newer
+    assetsDir: 'assets',
+    sourcemap: false,
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      }
+    }
+  },
   server: {
     // https: {
     //   key: fs.readFileSync('/Users/CodeWisdom/ssl/localhost.key'),

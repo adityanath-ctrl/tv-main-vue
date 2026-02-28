@@ -1,4 +1,4 @@
-import { ActionContext } from 'vuex'
+import { type ActionContext   } from 'vuex'
 import createPersistedState from "vuex-persistedstate";
 
 

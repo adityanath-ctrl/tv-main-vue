@@ -1,6 +1,6 @@
-import {ActionContext} from 'vuex'
+import { type ActionContext   } from 'vuex'
 import createPersistedState from "vuex-persistedstate";
-import {getGuestToken, getPackagesById, tokenExpired} from '../utils/siberapi';
+import {getGuestToken, getPackagesById, isTokenExpired} from '../utils/siberAPI';
 
 
 export const PackageStore = {
@@ -19,7 +19,7 @@ export const PackageStore = {
             if (token == '') {
                 token = localStorage.getItem('authToken') || "";
             }
-            if (tokenExpired(token) || auth.auth.tokenMode == "guest") {
+            if (isTokenExpired(token) || auth.auth.tokenMode == "guest") {
                 getGuestToken().then((value : any) => {
                     let apiParams = {
                         token: value.data.access_token,

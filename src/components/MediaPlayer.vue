@@ -703,7 +703,7 @@ const playerSettings = computed(() => {
 
   const settings = {
     licenseKey: RADIANTMEDIAPLAYER_LICENCE_KEY,
-    pathToRmpFiles: '/radiantmediaplayer/',
+    pathToRmpFiles: './radiantmediaplayer/',
     src: streamingUrl ? { hls: streamingUrl } : undefined,
     autoplay: true,
     skin: props.playerSkin || 's1',

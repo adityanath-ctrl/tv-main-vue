@@ -1,6 +1,6 @@
-import Auth from '../types/authType'
-import { InjectionKey } from 'vue'
-import { createStore, Store } from 'vuex'
+import type Auth from '../types/authType'
+import { type InjectionKey } from 'vue'
+import { createStore, type Store } from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import Cookies from 'js-cookie'
 import { AuthStore } from './authStore'
@@ -18,7 +18,7 @@ import { PackageStore } from './packageStore'
 import { ProviderStore } from './providerStore'
 import { RadioStationsStore } from './radioStationsStore'
 
-interface storeTypes extends Auth {}
+interface storeTypes extends Auth { }
 export const key: InjectionKey<Store<storeTypes>> = Symbol()
 
 export const store = createStore<storeTypes>({
@@ -41,10 +41,10 @@ export const store = createStore<storeTypes>({
   plugins: [
     createPersistedState({
       storage: {
-        getItem: (key) => Cookies.get(key),
-        setItem: (key, value) =>
+        getItem: (key: string) => Cookies.get(key),
+        setItem: (key: string, value: string) =>
           Cookies.set(key, value, { expires: 730, secure: true }), // 730 days = 2 years
-        removeItem: (key) => Cookies.remove(key),
+        removeItem: (key: string) => Cookies.remove(key),
       },
     }),
   ],

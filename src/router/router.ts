@@ -1,5 +1,5 @@
 /* /src/router/router.ts */
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
 import protectedRoute from '../middlewares/protected'
 import Featured from '../views/Featured/index.vue'
 import Profile from '../views/Profile.vue'
@@ -37,12 +37,12 @@ const fullAppRoutes: Array<RouteRecordRaw> = [
   { path: '/menu/:menuId', name: 'FeaturedCategoriesMainMenu', component: Featured },
   { path: '/menu/:menuId/s/:subMenuId', name: 'FeaturedCategoriesSubMainMenu', component: Featured },
 
-  { path: '/player/live-tv/:liveId', name: 'LivePlayer', component: LivePlayer, meta: { lockScroll: true }},
-  { path: '/player/match/:sportId', name: 'SportPlayer', component: SportPlayer, meta: { lockScroll: true }},
-  { path: '/player/radio/:radioId', name: 'RadioPlayer', component: RadioPlayer, meta: { lockScroll: true }},
-  { path: '/player/video/:eventId', name: 'EventPlayer', component: EventPlayer, meta: { lockScroll: true }},
-  { path: '/player/movie/:movieId', name: 'MoviePlayer', component: MoviePlayer, meta: { lockScroll: true, hidesGlobalUI: true }},
-  { path: '/player/series/:seriesId/:episodeId', name: 'SeriesPlayer', component: SeriesPlayer, meta: { lockScroll: true }},
+  { path: '/player/live-tv/:liveId', name: 'LivePlayer', component: LivePlayer, meta: { lockScroll: true } },
+  { path: '/player/match/:sportId', name: 'SportPlayer', component: SportPlayer, meta: { lockScroll: true } },
+  { path: '/player/radio/:radioId', name: 'RadioPlayer', component: RadioPlayer, meta: { lockScroll: true } },
+  { path: '/player/video/:eventId', name: 'EventPlayer', component: EventPlayer, meta: { lockScroll: true } },
+  { path: '/player/movie/:movieId', name: 'MoviePlayer', component: MoviePlayer, meta: { lockScroll: true, hidesGlobalUI: true } },
+  { path: '/player/series/:seriesId/:episodeId', name: 'SeriesPlayer', component: SeriesPlayer, meta: { lockScroll: true } },
 
   { path: '/svod/movie/:id', name: 'MovieDetails', component: MovieDetails },
   { path: '/svod/series/:id', name: 'SeriesDetails', component: SeriesDetails },
@@ -87,7 +87,7 @@ const resetScrollOnRoutes = new Set([
 ])
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
   scrollBehavior() {
     return { left: 0, top: 0 };

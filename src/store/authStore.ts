@@ -1,7 +1,11 @@
-import { Obj } from '@popperjs/core';
-import { ActionContext } from 'vuex'
-import Auth from '../types/authType'
-import { getMenuList, getGuestToken, tokenExpired, getConnection, showUserDevices } from '../utils/siberapi';
+import { type ActionContext   } from 'vuex'
+import type Auth from '../types/authType'
+import { getMenuList, getGuestToken, isTokenExpired, getConnection, showUserDevices } from '../utils/siberAPI';
+
+interface AuthState {
+    auth: Auth;
+    devices?: Array<any>;
+}
 
 export const AuthStore = {
     state: {
@@ -14,27 +18,22 @@ export const AuthStore = {
     },
 
     getters: {
-        isUserLoggedIn(state: Auth): boolean {
+        isUserLoggedIn(state: AuthState): boolean {
             return state.auth.tokenMode !== "guest";
         },
-        getAuth(state: Auth): Auth {
-            return state
+        getAuth(state: AuthState): Auth {
+            return state.auth
         },
-        getToken(state: Auth): string {
-            return state.msalToken;
+        getToken(state: AuthState): string {
+            return state.auth.msalToken;
         }
     },
     actions: {
-        setToken(context: ActionContext<Auth, Auth>, playload: Auth): void {
-            //console.log('===== authStore.setToken =====')
-            //console.log('payload', playload);
-            //console.log('getAccount', context.getters.getAccount);
-            //console.log('getAuth', context.getters.getAuth);
-            //console.log('getToken', context.getters.getToken);
-
+        setToken(context: ActionContext<AuthState, any>, playload: Auth): void {
+            // ... (rest of the code)
             if (playload.tokenMode == 'guest') {
                 var authToken = localStorage.getItem("authToken") || '';
-                if (tokenExpired(authToken)) {
+                if (isTokenExpired(authToken)) {
                     getGuestToken().then(res => {
                         playload.msalToken = res.data.access_token;
                         playload.loggedIn = false;
@@ -49,7 +48,7 @@ export const AuthStore = {
                                     context.dispatch('setAccount', accountData, { root: true });
                                     context.dispatch('setMainMenu', menuData, { root: true });
                                 });
-                            } 
+                            }
                             else if (res1.data.response.account.status == 400) {
                                 console.log("Error 400 in login");
                             }
@@ -68,7 +67,7 @@ export const AuthStore = {
                                 context.dispatch('setAccount', accountData, { root: true });
                                 context.dispatch('setMainMenu', menuData, { root: true });
                             });
-                        } 
+                        }
                         else if (res1.data.response.account.status == 400) {
                             console.log("Error 400 in login");
                         }
@@ -77,10 +76,7 @@ export const AuthStore = {
             }
 
             else {
-                //console.log ("playload.tokenMode is Not Guest");
-                //console.log ("playload.msalToken = " + playload.msalToken);                
-
-                if (tokenExpired(playload.msalToken)) {
+                if (isTokenExpired(playload.msalToken)) {
                     getGuestToken().then(res => {
                         playload.msalToken = res.data.access_token;
                         localStorage.setItem("authToken", res.data.access_token);
@@ -94,7 +90,7 @@ export const AuthStore = {
                                     context.dispatch('setAccount', accountData, { root: true });
                                     context.dispatch('setMainMenu', menuData, { root: true });
                                 });
-                            } 
+                            }
                             else if (res1.data.response.account.status == 400) {
                                 showUserDevices(playload.msalToken).then(res => {
                                     context.dispatch('setDevices', res.data.response.devices);
@@ -125,16 +121,16 @@ export const AuthStore = {
                 }
             }
         },
-        setDevices(context: ActionContext<Auth, Auth>, data: any): void {
+        setDevices(context: ActionContext<AuthState, any>, data: any): void {
             context.commit('setDevices', data);
         }
     },
     mutations: {
-        setToken(state: Auth, data: Auth): void {
+        setToken(state: AuthState, data: Auth): void {
             state.auth = data;
         },
-        setDevices(state: Auth, data: Array<Obj>): void {
-            state.devices = data;
+        setDevices(state: AuthState, data: Array<any>): void {
+            state.auth.devices = data;
         }
     }
 

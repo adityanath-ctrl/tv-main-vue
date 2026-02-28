@@ -1,5 +1,5 @@
-import { ActionContext } from 'vuex'
-import { getRadioStationsByCategoryId } from '../utils/siberapi'
+import { type ActionContext   } from 'vuex'
+import { getRadioStationsByCategoryId } from '../utils/siberAPI'
 
 export const RadioStationsStore = {
   state: {

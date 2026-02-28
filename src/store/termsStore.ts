@@ -1,8 +1,12 @@
-import { ActionContext } from 'vuex'
+import { type ActionContext   } from 'vuex'
 import createPersistedState from "vuex-persistedstate";
-import Auth from '../types/authType'
+import type Auth from '../types/authType'
 
 
+
+interface TermsState {
+  auth: Auth;
+}
 
 export const TermsStore = {
   state: {
@@ -10,21 +14,21 @@ export const TermsStore = {
       loggedIn: false,
       msalToken: '',
     }
-    
+
   },
   getters: {
-    getTermsStore(state: Auth): Auth{
+    getTermsStore(state: TermsState): TermsState {
       return state;
-    } 
+    }
   },
-  actions: { 
-    setTermsStore(context: ActionContext<Auth, Auth>, data: Auth): void{
+  actions: {
+    setTermsStore(context: ActionContext<TermsState, any>, data: Auth): void {
       context.commit('setTermsStore', data);
     }
   },
   mutations: {
-    setTermsStore(state: Auth, data: Auth): void{
-      state.auth = data; 
+    setTermsStore(state: TermsState, data: Auth): void {
+      state.auth = data;
     }
   },
   plugins: [
@@ -35,5 +39,5 @@ export const TermsStore = {
     //   }
     // })
   ],
-  
+
 }
