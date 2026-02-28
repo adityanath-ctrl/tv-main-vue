@@ -1,0 +1,132 @@
+<template>
+  <v-container fluid style="padding:0px" @click="navigationStateChange()">
+    <v-row :style="{ marginBottom: FeaturedItems?.length ? '30px' : '120px' }">
+      <v-col cols="12" md="12">
+        <Slider v-if="FeaturedItems?.length" :FeaturedSlider="FeaturedItems" />
+      </v-col>
+    </v-row>
+
+    <v-row v-for="(category, i) in Categories" :id="`catid-${category.menuCategoryIds}`"
+      v-show="`catid-${category.menuCategoryIds}` !== `catid-${categoriesWithNoEvents}`">
+      <v-col cols="6" md="6"
+        v-if="category.menuContentType == 'LIVE_EVENTS' || category.menuContentType == 'LIVE_TV' || category.menuContentType == 'SVOD' || category.menuContentType == 'LIVE_STREAM' || category.menuContentType == 'SPORTS'">
+        <h4 class="text-left ml-10 fcw">{{ category.categoryName }}</h4>
+      </v-col>
+      <v-col cols="6" md="6" class="d-flex flex-row-reverse pr-8"
+        v-if="category.menuContentType == 'LIVE_EVENTS' || category.menuContentType == 'LIVE_TV' || category.menuContentType == 'SVOD' || category.menuContentType == 'LIVE_STREAM' || category.menuContentType == 'SPORTS'">
+        <img class="ml-10 fcw" :src="ViewMoreButton" :style="viewMoreButtonStyle"
+          @click="goToCategoryPage(category.menuCategoryIds, category.menuContentType)" />
+      </v-col>
+      <v-col cols="12" md="12">
+        <CardEvents :categoryId="category.menuCategoryIds" v-if="category.menuContentType == 'LIVE_EVENTS'"
+          @no-events="handleNoEvents" />
+        <!-- <pre>{{ category.menuCategoryIds }}</pre> -->
+        <CardLive :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'LIVE_TV'" />
+        <CardVod :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'SVOD'" />
+        <CardStream :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'LIVE_STREAM'" />
+        <CardSports :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'SPORTS'" />
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script lang="js">
+
+import Slider from '../components/Slider.vue';
+import CardEvents from '../components/CardEvents.vue';
+import CardLive from '../components/CardLive.vue';
+import CardVod from '../components/CardVod.vue';
+import CardStream from '../components/CardStream.vue';
+import CardSports from '../components/CardSports.vue';
+import ViewMoreButton from '../assets/img/view-more-button-icon-words-only.svg';
+import { BACKGROUND_COLOR_1, FONT_COLOR_1 } from '@/mainConfig';
+
+export default ({
+  name: 'DynamicHome',
+  components: {
+    Slider,
+    CardEvents,
+    CardLive,
+    CardVod,
+    CardStream,
+    CardSports,
+  },
+  data: () => ({
+    open: ['Users'],
+    FeaturedItems: [],
+    ViewMoreButton: ViewMoreButton,
+    categoriesWithNoEvents: '',
+    viewMoreButtonStyle: {
+      'width': '150px',
+      'cursor': 'pointer'
+    }
+  }),
+  created() {
+    //console.log(this.$route.params.menuId);
+  },
+  beforeRouteUpdate(to, from, next) {
+    //console.log(to.params.menuId);
+    next();
+  },
+  mounted() {
+   
+  },
+  computed: {
+    Categories() {
+      let MainMenuTypes = this.$store.state.MenuStore.MainMenuTypes;
+      if (MainMenuTypes.length) {
+        //console.log('MainMenuTypes', MainMenuTypes);
+        if (this.$route.params.subMenuId) {
+          let data = MainMenuTypes[this.$route.params.menuId].sub_menu_items.find(arr => arr.id == this.$route.params.subMenuId);
+          return data.length ? data.categories : [];
+        } else {
+          return MainMenuTypes.length ? MainMenuTypes[this.$route.params.menuId].categories : [];
+        }
+      }
+    },
+    FeaturedItems() {
+      let MainMenuTypes = this.$store.state.MenuStore.MainMenuTypes;
+      //console.log('MainMenuTypes:', JSON.stringify(MainMenuTypes, null, 2)); // Log MainMenuTypes to see its structure
+
+      if (MainMenuTypes.length) {
+        let featuredItems = MainMenuTypes[this.$route.params.menuId]?.featured_items;
+          //console.log('Top menu featured items:', JSON.stringify(featuredItems, null, 2)); // Log menu featured items
+          if (featuredItems) {
+            return featuredItems;
+          } else {
+            console.error('No menu featured items');
+          }
+      } else {
+        console.error('No MainMenuTypes data');
+      }
+
+      return []; // Return an empty array as a fallback if no featured items are found
+    }
+  },
+  watch: {
+    categoriesWithNoEvents(newVal, oldVal) {
+      //console.log('categoriesWithNoEvents changed from', oldVal, 'to', newVal);
+    },
+    Categories(newVal) {
+      //console.log('===== SubMenuItem This =====', JSON.stringify(this, null, 2));
+      return newVal;
+    },
+    FeaturedItems(newVal) {
+      return newVal;
+    }
+  },
+  methods: {
+    goToCategoryPage(id, menuContentType) {
+      this.$router.push({ path: '/category/' + id + '/' + menuContentType });
+    },
+    handleNoEvents(categoryId) {
+      //console.log('Receiving handleNoEvents:', categoryId);
+      this.categoriesWithNoEvents = categoryId;
+    },
+    navigationStateChange() {
+      this.$store.dispatch("changeNavigationState", false);
+    }
+  }
+});
+
+</script>

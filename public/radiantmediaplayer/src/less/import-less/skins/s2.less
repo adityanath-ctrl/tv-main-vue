@@ -1,0 +1,258 @@
+/* Colors for s2 */
+@s2-background: rgba(0, 0, 0, 0);
+
+/* applying s2 colors to player */
+.rmp-s2 .rmp-color-bg,
+.rmp-s2 .rmp-module-overlay-icons {
+  background: @s2-background;
+}
+
+.rmp-s2.rmp-transcripts-side-menu,
+.rmp-s2.rmp-playlist-side-menu {
+  background: @black;
+}
+
+.rmp-s2 .rmp-control-bar {
+  background: linear-gradient(
+    @shadow-7,
+    @shadow-6,
+    @shadow-5,
+    @shadow-4,
+    @shadow-3
+  );
+}
+
+.rmp-s2 .rmp-ad-markers,
+.rmp-s2 .rmp-cue-point {
+  background: @button;
+}
+
+.rmp-s2 .rmp-volume-bar-sliding-handle,
+.rmp-s2 .rmp-volume-bar-sliding-current-position,
+.rmp-s2 .rmp-seek-bar-sliding-handle,
+.rmp-s2 .rmp-seek-bar-sliding-current-position {
+  background: @accent;
+}
+
+.rmp-s2 .rmp-overlay-level:hover:not(.rmp-overlay-level-active) {
+  color: @accent;
+}
+
+.rmp-s2 .rmp-overlay-level {
+  background: @shadow-1;
+  border-color: @shadow-1;
+}
+
+.rmp-s2 .rmp-seek-bar-sliding-loaded {
+  background: @white-shadow-1;
+}
+
+.rmp-s2 .rmp-overlay-level-active {
+  background: @button;
+  color: @accent;
+  border-color: @button;
+}
+
+.rmp-s2 .rmp-overlay-level-active.rmp-abr-active,
+.rmp-s2 .rmp-seek-bar-sliding-area {
+  border-color: @button;
+}
+
+.rmp-s2 .rmp-related-skip-preview-up-next,
+.rmp-s2 .rmp-related-skip-preview-title,
+.rmp-s2 .rmp-indicator,
+.rmp-s2 .rmp-cue-point-text,
+.rmp-s2 .rmp-related-title,
+.rmp-s2 .rmp-related-duration {
+  background: @shadow-1;
+}
+
+.rmp-s2 .rmp-module-hint,
+.rmp-s2 .rmp-control-bar-hint {
+  background: @shadow-1;
+  border: none;
+}
+
+.rmp-s2 .rmp-module-hint {
+  margin-top: 0;
+}
+
+/* border-radius adjustment */
+.rmp-s2 .rmp-overlay-level,
+.rmp-s2 .rmp-time,
+.rmp-s2 .rmp-seek-bar-sliding-area,
+.rmp-s2 .rmp-module-hint,
+.rmp-s2 .rmp-module-fcc-settings,
+.rmp-s2 .rmp-module-overlay-icons,
+.rmp-s2 .rmp-control-bar-hint,
+.rmp-s2 .rmp-indicator,
+.rmp-s2 .rmp-seek-bar-sliding-current-position,
+.rmp-s2 .rmp-seek-bar-sliding-loaded,
+.rmp-s2 .rmp-volume-bar-sliding-current-position,
+.rmp-s2 .rmp-volume-bar-sliding-area,
+.rmp-s2 .rmp-cue-point-text,
+.rmp-s2.rmp-dvr .rmp-time-elapsed-text,
+.rmp-s2 .rmp-quality-indicator {
+  .border-radius(2px);
+}
+
+.rmp-s2 .rmp-related-skip-preview-up-next {
+  .border-radius-top-only(2px);
+}
+
+.rmp-s2 .rmp-related-skip-preview-title,
+.rmp-s2.rmp-seek-bar-thumbnails-ui .rmp-indicator {
+  .border-radius-bottom-only(2px);
+}
+
+.rmp-s2.rmp-seek-bar-thumbnails-ui .rmp-indicator {
+  .optimised-box-shadow-lg();
+}
+
+.rmp-s2.rmp-seek-bar-thumbnails-ui .rmp-thumbnails {
+  border: 1px solid @shadow-1;
+  border-bottom: none;
+  .optimised-box-shadow-lg();
+  .border-radius-top-only(2px);
+}
+
+/* central play button */
+.rmp-s2 .rmp-overlay-button,
+.rmp-s2 .rmp-loading-spin,
+.rmp-s2 .rmp-mobile-central-ui {
+  background: @shadow-1;
+  width: 100px;
+  margin-left: -50px;
+  height: 100px;
+  margin-top: -50px;
+  .border-radius(100px);
+}
+
+.rmp-s2.rmp-sm .rmp-overlay-button,
+.rmp-s2.rmp-sm .rmp-loading-spin,
+.rmp-s2.rmp-sm .rmp-mobile-central-ui {
+  width: 76px;
+  margin-left: -38px;
+  height: 76px;
+  margin-top: -44px;
+  .border-radius(76px);
+}
+
+.rmp-s2 .rmp-overlay-button .rmp-i-play::before,
+.rmp-s2 .rmp-mobile-central-ui .rmp-i-play::before {
+  margin-left: 4px;
+}
+
+.rmp-s2 .rmp-loading-spin-circle {
+  top: 26px;
+  left: 26px;
+}
+
+.rmp-sm.rmp-s2 .rmp-loading-spin-circle, .rmp-xs.rmp-s2 .rmp-loading-spin-circle {
+  top: 14px;
+  left: 14px;
+}
+
+/* .rmp-time */
+.rmp-s2 .rmp-time {
+  height: 48px;
+  line-height: 48px;
+  background: none;
+  padding: 0;
+  flex-grow: 6;
+  text-align: left;
+}
+
+.rmp-s2 .rmp-related-skip-preview {
+  top: -166px;
+}
+
+/* .rmp-seek-bar */
+.rmp-s2 .rmp-seek-bar {
+  position: absolute;
+  left: 12px;
+  width: calc(100% - 24px);
+  top: -8px;
+  height: 8px;
+  .transition(~"top, height", 0.1s, linear);
+}
+
+.rmp-s2 .rmp-seek-bar:hover {
+  top: -9px;
+  height: 10px;
+  cursor: pointer;
+}
+
+.rmp-s2 .rmp-seek-bar-sliding-area {
+  height: 100%;
+  background: @white-shadow-1;
+}
+
+.rmp-s2 .rmp-seek-bar-sliding-handle {
+  width: 0;
+  height: 0;
+}
+
+.rmp-s2 .rmp-seek-bar:hover .rmp-seek-bar-sliding-handle {
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  margin-left: -8px;
+  .border-radius(16px);
+}
+
+.rmp-s2 .rmp-indicator,
+.rmp-s2 .rmp-control-bar-hint {
+  top: -40px;
+}
+
+/* volume bar */
+.rmp-s2 .rmp-volume-bar-sliding-area {
+  height: 8px;
+}
+
+.rmp-s2 .rmp-volume-bar {
+  flex-grow: 6;
+  margin-top: 8px;
+}
+
+.rmp-s2 .rmp-volume-bar-sliding-handle {
+  width: 16px;
+  height: 16px;
+  margin-top: -2px;
+  margin-left: -8px;
+  .border-radius(16px);
+}
+
+/* Module */
+.rmp-s2 .rmp-module-overlay-icons:not(.rmp-module-overlay-icons-active) {
+  box-shadow: initial;
+}
+
+/* Ads CSS */
+.rmp-s2 .rmp-ad-info {
+  flex-grow: 6;
+}
+
+.rmp-s2.rmp-linear-ad-ui .rmp-volume-bar,
+.rmp-outstream .rmp-volume-bar {
+  flex-grow: initial;
+}
+
+.rmp-s2 .rmp-ad-container.rmp-ad-overlay {
+  top: -60px;
+}
+
+/* cue points */
+.rmp-s2 .rmp-cue-point {
+  top: -2px;
+  .transition(~"top", 0.1s, linear);
+}
+
+.rmp-s2 .rmp-cue-point-text {
+  top: -30px;
+}
+
+.rmp-s2 .rmp-seek-bar:hover .rmp-cue-point {
+  top: -1px;
+}

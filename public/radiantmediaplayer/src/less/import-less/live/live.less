@@ -1,0 +1,21 @@
+/* 
+ * Live UI (not DVR UI)
+ */
+.rmp-live .rmp-seek-bar,
+.rmp-live .rmp-duration-text,
+.rmp-live .rmp-time-separator {
+  display: none !important;
+}
+
+.rmp-live .rmp-time {
+  flex-grow: 4;
+  text-align: left;
+}
+
+.rmp-live.rmp-sm:not(.rmp-linear-ad-ui) .rmp-time {
+  display: block !important;
+} 
+
+.rmp-live .rmp-volume-bar {
+  flex-grow: 4;
+}

@@ -1,0 +1,27 @@
+/* cue points */
+.rmp-cue-point {
+  position: absolute;
+  top: 5px;
+  height: 12px;
+  width: 12px;
+  .border-radius(12px);
+}
+
+.rmp-cue-point-text {
+  position: absolute;
+  top: -48px;
+  opacity: 0;
+  visibility: hidden;
+  width: auto;
+  margin-left: auto;
+  text-align: center;
+  height: 24px;
+  line-height: 24px;
+  z-index: 1000;
+  padding: 0 8px;
+  white-space: nowrap;
+  .transform-translateX();
+  .transition(~"opacity, visibility");
+  .unselectable();
+  .optimised-box-shadow-md();
+}

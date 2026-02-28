@@ -1,0 +1,170 @@
+/* TV skin specific CSS
+ * Note that TV skin is an extension to s2 skin
+ */
+
+/* control bar */
+.rmp-tv .rmp-control-bar {
+  height: 96px;
+}
+
+.rmp-tv .rmp-play-pause {
+  max-width: initial;
+  min-width: 96px;
+}
+
+.rmp-tv .rmp-seek-bar {
+  top: -16px;
+  height: 16px;
+}
+
+.rmp-tv .rmp-seek-bar:hover {
+  top: -16px;
+  height: 16px;
+}
+
+.rmp-tv .rmp-time {
+  font-size: 18px;
+}
+
+.rmp-xl.rmp-tv .rmp-time {
+  font-size: 32px;
+}
+
+.rmp-tv .rmp-control-bar .rmp-indicator {
+  font-size: 18px;
+  height: 40px;
+  line-height: 40px;
+  width: 160px;
+  top: -72px;
+  margin-left: -80px;
+}
+
+.rmp-tv .rmp-control-bar .rmp-fast-indicator {
+  height: 40px;
+  line-height: 40px;
+  left: 8px;
+  width: 40px;
+  display: inline-block;
+  position: absolute;
+}
+
+.rmp-tv .rmp-control-bar .rmp-time-indicator {
+  height: 40px;
+  line-height: 40px;
+  display: inline-block;
+  position: absolute;
+  left: 56px;
+  width: 96px;
+  text-align: center;
+}
+
+.rmp-tv .rmp-overlay-menu-selection {
+  justify-content: flex-start;
+  margin: 16px;
+  height: 72px;
+}
+
+.rmp-tv
+  .rmp-module-overlay-icons:not(.rmp-module-overlay-play-pause):not(
+    .rmp-module-overlay-close
+  ) {
+  margin: 0 16px 0 0;
+}
+
+.rmp-tv .rmp-module-overlay-icons {
+  width: 72px;
+  height: 72px;
+  line-height: 72px;
+}
+
+.rmp-tv .rmp-seek-bar:hover .rmp-seek-bar-sliding-handle,
+.rmp-tv .rmp-overlay-button,
+.rmp-tv .rmp-module-fcc-settings,
+.rmp-tv .rmp-overlay-menu-selection .rmp-module-overlay-play-pause,
+.rmp-tv .rmp-overlay-menu-selection .rmp-i-quality {
+  display: none !important;
+}
+
+/* Modules overlay */
+.rmp-tv .rmp-overlay-level {
+  font-size: 18px;
+  height: 48px;
+  line-height: 48px;
+  min-width: 288px;
+  margin: 8px 0;
+}
+
+.rmp-xl.rmp-tv .rmp-overlay-level {
+  height: 72px;
+  line-height: 72px;
+  min-width: 516px;
+  font-size: 32px;
+  margin: 16px 0;
+}
+
+
+/* Loader */
+.rmp-tv .rmp-loading-spin {
+  height: 120px !important;
+  width: 120px !important;
+  margin-top: -60px !important;
+  margin-left: -60px !important;
+}
+
+.rmp-tv .rmp-loading-spin-circle {
+  width: 80px !important;
+  height: 80px !important;
+  left: 20px !important;
+  top: 20px !important;
+  border-width: 6px !important;
+}
+
+/* Ads */
+.rmp-tv .rmp-ad-info {
+  font-size: 18px;
+  height: 96px;
+  line-height: 96px;
+}
+
+.rmp-xl.rmp-tv .rmp-ad-info {
+  font-size: 32px;
+}
+
+/* fast-rewind */
+.rmp-tv .rmp-fast-rewind {
+  order: 2;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+/* fast-forward */
+.rmp-tv .rmp-fast-forward {
+  order: 5;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+/* CC */
+.rmp-tv .rmp-cc-area {
+  bottom: 112px;
+}
+
+/* Title / description */
+.rmp-tv .rmp-title {
+  margin: 16px 0 0 16px;
+  font-size: 32px;
+}
+
+.rmp-tv .rmp-description {
+  margin: 16px 0 0 16px;
+  font-size: 18px;
+}
+
+/* Live/DVR */
+.rmp-tv.rmp-dvr.rmp-dvr-vod .rmp-duration-text {
+  font-size: 18px;
+}
+
+.rmp-xl.rmp-tv.rmp-dvr.rmp-dvr-vod .rmp-duration-text {
+  font-size: 32px;
+}

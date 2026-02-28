@@ -1,0 +1,39 @@
+import { ActionContext } from 'vuex'
+import createPersistedState from "vuex-persistedstate";
+import Auth from '../types/authType'
+
+
+
+export const PrivacyStore = {
+  state: {
+    auth: {
+      loggedIn: false,
+      msalToken: '',
+    }
+    
+  },
+  getters: {
+    getPrivacyStore(state: Auth): Auth{
+      return state;
+    } 
+  },
+  actions: { 
+    setPrivacyStore(context: ActionContext<Auth, Auth>, data: Auth): void{
+      context.commit('setPrivacyStore', data);
+    }
+  },
+  mutations: {
+    setPrivacyStore(state: Auth, data: Auth): void{
+      state.auth = data; 
+    }
+  },
+  plugins: [
+    // createPersistedState({
+    //   auth: {
+    //     // getItem: (key) => window.localStorage.getItem('signInfo'),
+    //     // setItem(key, value) => commit('setToken', value)
+    //   }
+    // })
+  ],
+  
+}

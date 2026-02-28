@@ -1,0 +1,32 @@
+/* 
+ * DVR UI 
+ */
+
+/* when casting is engaged DVR streams are handled as simple live streams by Google Cast receiver app */
+.rmp-casting.rmp-dvr .rmp-seek-bar-sliding-area,
+.rmp-casting.rmp-dvr .rmp-duration-text,
+.rmp-dvr.rmp-dvr-live .rmp-duration-text,
+.rmp-dvr .rmp-time-separator,
+.rmp-dvr.rmp-sm .rmp-time,
+.rmp-dvr.rmp-xs .rmp-time {
+  display: none !important;
+}
+
+/* Recorded DVR content adjustment */
+.rmp-dvr.rmp-dvr-vod .rmp-time {
+  cursor: pointer;
+}
+
+.rmp-dvr.rmp-dvr-vod .rmp-time-elapsed-text {
+  padding: 6px 8px;
+}
+
+.rmp-dvr.rmp-dvr-vod .rmp-time-elapsed-text::before {
+  content: "\21BA";
+  margin-right: 4px;
+}
+
+.rmp-dvr.rmp-dvr-vod .rmp-duration-text {
+  display: inline;
+  margin-left: 8px;
+}

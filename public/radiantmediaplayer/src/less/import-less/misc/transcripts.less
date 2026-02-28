@@ -1,0 +1,68 @@
+.rmp-transcripts-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  .font-rmp();
+}
+
+.rmp-transcripts-container * {
+  box-sizing: border-box;
+}
+
+.rmp-transcripts-player-wrapper {
+  order: 1;
+  flex: 1 0 67%;
+}
+
+/* transcripts side menu */
+.rmp-transcripts-side-menu {
+  order: 2;
+  flex: 1 0 33%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* transcripts side menu header */
+.rmp-transcripts-header {
+  text-align: center;
+  font-size: 18px;
+  padding: 4px 0;
+}
+
+.rmp-transcripts-select {
+  margin: 0 10%;
+}
+
+.rmp-transcripts-body {
+  padding: 8px;
+}
+
+/* transcripts side menu item */
+.rmp-transcripts-item {
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 2px;
+  .transition(~"color, background");
+}
+
+.rmp-transcripts-item-active {
+  .border-radius();
+}
+
+.rmp-transcripts-side-menu.rmp-md .rmp-transcripts-item,
+.rmp-transcripts-side-menu.rmp-sm .rmp-transcripts-item,
+.rmp-transcripts-side-menu.rmp-xs .rmp-transcripts-item {
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.rmp-transcripts-side-menu.rmp-md .rmp-transcripts-header,
+.rmp-transcripts-side-menu.rmp-sm .rmp-transcripts-header,
+.rmp-transcripts-side-menu.rmp-xs .rmp-transcripts-header {
+  font-size: 14px;
+}

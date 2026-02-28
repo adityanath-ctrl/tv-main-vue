@@ -1,0 +1,19 @@
+/* 
+ * VPAID 
+ *
+ * VPAID with no controls or full-slot ad sense === no UI while ad is on stage 
+ */
+.rmp-ad-no-ui .rmp-control-bar,
+.rmp-ad-no-ui .rmp-module,
+.rmp-ad-no-ui .rmp-loading-spin,
+.rmp-ad-no-ui .rmp-mobile-central-ui,
+.rmp-ad-no-ui .rmp-overlay-button {
+  display: none !important;
+}
+
+/* VPAID with adVpaidControls: true - force display of controls */
+.rmp-ad-vpaid-force-controls .rmp-control-bar {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}

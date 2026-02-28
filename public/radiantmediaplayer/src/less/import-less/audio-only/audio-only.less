@@ -1,0 +1,149 @@
+/* audio only */
+
+.rmp-audio-only .rmp-title-area,
+.rmp-audio-only .rmp-module:not(.rmp-cast):not(.rmp-airplay),
+.rmp-audio-only .rmp-quality,
+.rmp-audio-only .rmp-audio,
+.rmp-audio-only .rmp-captions,
+.rmp-audio-only .rmp-overlay-button,
+.rmp-audio-only .rmp-mobile-central-ui,
+.rmp-audio-only .rmp-indicator,
+.rmp-audio-only .rmp-fullscreen,
+.rmp-audio-only .rmp-volume-bar,
+.rmp-audio-only .rmp-loading-spin {
+  display: none !important;
+}
+
+/* do not auto hide controls bar */
+.rmp-audio-only .rmp-control-bar {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+}
+
+.rmp-audio-only .rmp-i-minus {
+  order: 5;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+.rmp-audio-only .rmp-i-plus {
+  order: 6;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+.rmp-audio-only .rmp-volume:hover ~ .rmp-volume-bar ~ .rmp-time,
+.rmp-audio-only .rmp-volume-bar:hover ~ .rmp-time {
+  display: block;
+}
+
+.rmp-audio-only .rmp-cast,
+.rmp-audio-only .rmp-airplay {
+  position: initial;
+  order: 11;
+  flex-grow: 1;
+  flex-basis: 48px;
+  margin: 0 8px 0 0;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.rmp-audio-only .rmp-airplay .rmp-i-airplay {
+  position: initial;
+  top: auto;
+  left: auto;
+  transform: none;
+  height: 48px;
+  line-height: 48px;
+}
+
+.rmp-audio-only.rmp-md .rmp-seek-bar,
+.rmp-audio-only.rmp-sm .rmp-seek-bar,
+.rmp-audio-only.rmp-xs .rmp-seek-bar,
+.rmp-audio-only.rmp-xs .rmp-airplay,
+.rmp-audio-only.rmp-xs .rmp-cast,
+.rmp-audio-only.rmp-xs .rmp-quick,
+.rmp-audio-only.rmp-xs .rmp-quick-both {
+  display: none !important;
+}
+
+/* error when audioOnly */
+.rmp-audio-only .rmp-error-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: @black;
+  color: @white;
+  height: 100%;
+  width: 100%;
+  line-height: 48px;
+  padding: 0;
+  border: none;
+  z-index: 1000;
+  margin-top: 0;
+  font-size: 14px;
+  .transform(none);
+}
+
+/* Live adjustment */
+.rmp-audio-only.rmp-wait-for-duration .rmp-time-elapsed-text {
+  display: none;
+}
+
+/* 
+ * Audio only spinner 
+ */
+.rmp-audio-only.rmp-waiting .rmp-audio-only-loading-spin {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.rmp-audio-only.rmp-error-ui .rmp-audio-only-loading-spin {
+  display: none;
+}
+
+.rmp-audio-only-loading-spin {
+  width: 100%;
+  height: 4px;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  .transition(~"opacity, visibility");
+}
+
+.rmp-audio-only-loading-spin::after {
+  content: "";
+  width: 168px;
+  height: 4px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  animation: animloader 2s linear infinite;
+}
+
+@keyframes animloader {
+  0% {
+    left: 0;
+    transform: translateX(-100%);
+  }
+
+  100% {
+    left: 100%;
+    transform: translateX(0%);
+  }
+}
+
+/*
+ * Audio only with video player > force poster to show
+ */
+.rmp-audio-only-use-video-layout .rmp-poster {
+  display: block !important;
+}

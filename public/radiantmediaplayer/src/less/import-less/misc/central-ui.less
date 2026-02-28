@@ -1,0 +1,67 @@
+/* central play/pause button (desktop + mobile) & loader */
+.rmp-overlay-button,
+.rmp-mobile-central-ui,
+.rmp-loading-spin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 80px;
+  margin-top: -40px;
+  width: 80px;
+  margin-left: -40px;
+  z-index: 1;
+  .transition(~"opacity, visibility");
+}
+
+/* initial values */
+.rmp-overlay-button,
+.rmp-loading-spin {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.rmp-mobile-central-ui {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* small sizes */
+.rmp-sm .rmp-overlay-button,
+.rmp-sm .rmp-mobile-central-ui,
+.rmp-sm .rmp-loading-spin {
+  height: 64px;
+  margin-top: -32px;
+  width: 64px;
+  margin-left: -32px;
+}
+
+.rmp-xs .rmp-overlay-button,
+.rmp-xs .rmp-mobile-central-ui,
+.rmp-xs .rmp-loading-spin {
+  display: none;
+}
+
+/* icon centering */
+.rmp-overlay-button .rmp-i-play,
+.rmp-overlay-button .rmp-i-pause,
+.rmp-overlay-button .rmp-i-replay,
+.rmp-mobile-central-ui .rmp-i-play,
+.rmp-mobile-central-ui .rmp-i-pause,
+.rmp-mobile-central-ui .rmp-i-replay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  .transform-translate();
+}
+
+/* when rmp-waiting is on player container we force visibility of loading spin and hide button */
+.rmp-waiting .rmp-loading-spin {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.rmp-waiting .rmp-overlay-button,
+.rmp-waiting .rmp-mobile-central-ui {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}

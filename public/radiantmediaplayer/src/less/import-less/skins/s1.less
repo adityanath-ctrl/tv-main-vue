@@ -1,0 +1,80 @@
+/* s1 specific CSS */
+@s1-background: rgba(33, 33, 33, 0.9);
+
+/* applying s1 colors to player */
+.rmp-s1 .rmp-color-bg,
+.rmp-s1 .rmp-module-overlay-icons,
+.rmp-s1 .rmp-related-duration,
+.rmp-s1 .rmp-related-title,
+.rmp-s1.rmp-transcripts-side-menu,
+.rmp-s1.rmp-playlist-side-menu {
+  background: @s1-background;
+}
+
+.rmp-s1 .rmp-ad-markers {
+  background: @accent;
+}
+
+.rmp-s1 .rmp-overlay-level {
+  border-color: @s1-background;
+}
+
+.rmp-s1 .rmp-overlay-level-active {
+  background: @button;
+  color: @s1-background;
+  border-color: @button;
+}
+
+/* border-radius adjustment */
+.rmp-s1 .rmp-volume-bar-sliding-area,
+.rmp-s1 .rmp-volume-bar-sliding-current-position,
+.rmp-s1 .rmp-volume-bar-sliding-handle,
+.rmp-s1 .rmp-seek-bar-sliding-area,
+.rmp-s1 .rmp-seek-bar-sliding-current-position,
+.rmp-s1 .rmp-seek-bar-sliding-loaded,
+.rmp-s1 .rmp-seek-bar-sliding-handle,
+.rmp-s1 .rmp-360-nav,
+.rmp-s1 .rmp-360-text,
+.rmp-s1 .rmp-module,
+.rmp-s1 .rmp-overlay-button,
+.rmp-s1 .rmp-mobile-central-ui,
+.rmp-s1 .rmp-loading-spin,
+.rmp-s1 .rmp-module-hint,
+.rmp-s1 .rmp-control-bar-hint,
+.rmp-s1 .rmp-indicator,
+.rmp-s1 .rmp-overlay-level,
+.rmp-s1 .rmp-module-overlay-icons,
+.rmp-s1 .rmp-module-fcc-settings,
+.rmp-s1 .rmp-cue-point-text,
+.rmp-s1.rmp-dvr .rmp-time-elapsed-text,
+.rmp-s1 .rmp-quality-indicator {
+  .border-radius(4px);
+}
+
+.rmp-s1 .rmp-related-skip-preview-up-next {
+  .border-radius-top-only(4px);
+}
+
+/* seek bar adjustment */
+.rmp-s1 .rmp-seek-bar-sliding-area {
+  top: 13px;
+  height: 22px;
+}
+
+.rmp-s1.rmp-seek-bar-thumbnails-ui .rmp-indicator {
+  .border-radius-bottom-only(4px);
+  .optimised-box-shadow-lg();
+}
+
+.rmp-s1.rmp-seek-bar-thumbnails-ui .rmp-thumbnails {
+  border: 1px solid @s1-background;
+  border-bottom: none;
+  .border-radius-top-only(4px);
+  .optimised-box-shadow-lg();
+}
+
+/* logo */
+.rmp-s1.rmp-md .rmp-logo-bottom-right,
+.rmp-s1.rmp-sm .rmp-logo-bottom-right {
+  bottom: 80px;
+}

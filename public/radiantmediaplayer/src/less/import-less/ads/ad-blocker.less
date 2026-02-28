@@ -1,0 +1,82 @@
+/* ad-blocker detected */
+.rmp-ad-block-container {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  margin: 0;
+  padding: 0;
+  width: 90%;
+  height: 90%;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  background-color: #212121;
+  text-align: center;
+  .border-radius(12px);
+  .font-rmp();
+}
+
+.rmp-ad-block-image {
+  flex-basis: 98px;
+}
+
+.rmp-ad-block-message {
+  padding: 0 16px 6px;
+}
+
+.rmp-ad-block-text {
+  font-size: 24px;
+  color: #ef5350;
+  margin-bottom: 4px;
+}
+
+.rmp-ad-block-text-extended {
+  font-size: 18px;
+  color: #fff;
+}
+
+.rmp-ad-block-button {
+  width: auto;
+  background: #ef5350;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 24px;
+  padding: 8px 16px;
+  align-self: center;
+  .border-radius(12px);
+  .transition(background-color);
+}
+
+.rmp-ad-block-button:hover {
+  background: #e53935;
+}
+
+.rmp-sm .rmp-ad-block-text-extended,
+.rmp-sm .rmp-ad-block-image,
+.rmp-xs .rmp-ad-block-text-extended,
+.rmp-xs .rmp-ad-block-image {
+  display: none;
+}
+
+.rmp-md .rmp-ad-block-text-extended {
+  display: none;
+}
+
+.rmp-md .rmp-ad-block-container {
+  justify-content: center;
+}
+
+.rmp-xl .rmp-ad-block-text {
+  font-size: 36px;
+}
+
+.rmp-xl .rmp-ad-block-text-extended {
+  font-size: 24px;
+}
+
+.rmp-xl .rmp-ad-block-button {
+  font-size: 24px;
+  padding: 16px 32px;
+}

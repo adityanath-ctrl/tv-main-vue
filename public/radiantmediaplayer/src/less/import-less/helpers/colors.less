@@ -1,0 +1,99 @@
+/* default color settings */
+@black: rgba(0, 0, 0, 1);
+@shadow-1: rgba(0, 0, 0, 0.72);
+@shadow-2: rgba(0, 0, 0, 0.6);
+@shadow-3: rgba(0, 0, 0, 0.48);
+@shadow-4: rgba(0, 0, 0, 0.36);
+@shadow-5: rgba(0, 0, 0, 0.24);
+@shadow-6: rgba(0, 0, 0, 0.12);
+@shadow-7: rgba(0, 0, 0, 0);
+@white: rgba(255, 255, 255, 1);
+@white-shadow-1: rgba(255, 255, 255, 0.36);
+@white-shadow-2: rgba(255, 255, 255, 0.12);
+
+/* chromecast button colors as per Google recommendations
+ * this is also used for UI focus on keyboard controls */
+@blue: rgba(33, 150, 243, 1);
+
+@button: rgba(255, 255, 255, 1);
+@accent: rgba(130, 177, 255, 1);
+@accent-light: rgba(130, 177, 255, 0.9);
+
+.rmp-volume-bar-sliding-current-position,
+.rmp-color-bg-sliding,
+.rmp-audio-only-loading-spin::after {
+  background: @button;
+}
+
+.rmp-ad-current-time,
+.rmp-quality-hd,
+.rmp-cue-point,
+.rmp-playlist-item:hover,
+.rmp-playlist-item-active,
+.rmp-transcripts-item-active,
+.rmp-dvr.rmp-dvr-vod .rmp-time-elapsed-text:hover {
+  background: @accent;
+}
+
+.rmp-color-button,
+.rmp-control-bar-hint,
+.rmp-time-elapsed-text,
+.rmp-duration-text,
+.rmp-module-hint,
+.rmp-quality-hd,
+.rmp-related-skip-preview-up-next,
+.rmp-transcripts-item-active:hover,
+.rmp-related-skip-preview-title {
+  color: @button;
+}
+
+.rmp-color-accent,
+.rmp-overlay-level:hover:not(.rmp-overlay-level-active),
+.rmp-related-item:hover .rmp-related-title,
+.rmp-related-item:hover .rmp-related-duration,
+.rmp-i:hover,
+.rmp-module:hover .rmp-i,
+.rmp-ad-info-message,
+.rmp-sup,
+.rmp-transcripts-item:hover:not(.rmp-transcripts-item-active),
+.rmp-pip-on .rmp-i-pip,
+.rmp-theater-on .rmp-i-theater,
+.rmp-related-item-active {
+  color: @accent;
+}
+
+.rmp-related-item-active,
+.rmp-module-overlay-icons-active {
+  box-shadow: 0 0 0 3px @accent;
+}
+
+.rmp-module-fcc-settings {
+  border-color: @button;
+}
+
+.rmp-transcripts-header,
+.rmp-playlist-header,
+.rmp-playlist-item {
+  border-color: @button;
+}
+
+.rmp-button.rmp-overlay-level.rmp-abr-active {
+  border-color: @accent;
+}
+
+.rmp-module-fcc-settings:hover {
+  border-color: @accent;
+  color: @accent;
+}
+
+.rmp-dvr.rmp-dvr-vod .rmp-time-elapsed-text {
+  background: @accent-light;
+}
+
+.rmp-loading-spin-circle {
+  color: @button;
+}
+
+.rmp-loading-spin-circle::after {
+  color: @accent;
+}

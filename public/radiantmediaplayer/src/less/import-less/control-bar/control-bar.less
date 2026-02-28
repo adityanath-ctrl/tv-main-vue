@@ -1,0 +1,324 @@
+/* player chrome bar (a.k.a. player controls) and inner elements */
+.rmp-control-bar {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  text-align: center;
+  overflow: visible;
+  opacity: 1;
+  visibility: visible;
+  text-shadow: none;
+  .transition(~"opacity, visibility");
+}
+
+.rmp-control-bar-hint {
+  font-size: 14px;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  padding: 0 8px;
+  height: 24px;
+  line-height: 24px;
+  white-space: nowrap;
+  margin: 0 4px;
+  top: -30px;
+  text-shadow: none;
+  .font-rmp();
+  .transition(~"opacity, visibility");
+  .unselectable();
+  .optimised-box-shadow-md();
+}
+
+.rmp-xl .rmp-control-bar-hint,
+.rmp-lg .rmp-control-bar-hint {
+  min-width: 90px;
+}
+
+.rmp-md .rmp-control-bar-hint,
+.rmp-sm .rmp-control-bar-hint {
+  min-width: 60px;
+}
+
+.rmp-mobile .rmp-control-bar-hint,
+.rmp-no-hint .rmp-control-bar-hint,
+.rmp-xs .rmp-control-bar-hint {
+  display: none !important;
+}
+
+.rmp-play-pause:hover .rmp-control-bar-hint,
+.rmp-volume:hover .rmp-control-bar-hint,
+.rmp-fullscreen:hover .rmp-control-bar-hint,
+.rmp-quality:hover .rmp-control-bar-hint,
+.rmp-captions:hover .rmp-control-bar-hint,
+.rmp-audio:hover .rmp-control-bar-hint,
+.rmp-quick:hover .rmp-control-bar-hint,
+.rmp-quick-both:hover .rmp-control-bar-hint {
+  opacity: 1;
+  visibility: visible;
+}
+
+.rmp-control-bar .rmp-button:first-of-type .rmp-control-bar-hint {
+  left: 0;
+  right: auto;
+}
+
+.rmp-control-bar .rmp-button:last-of-type .rmp-control-bar-hint {
+  right: 0;
+  left: auto;
+}
+
+/* before durationchange event we hide control bar */
+.rmp-wait-for-duration .rmp-control-bar {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* play/pause button */
+.rmp-play-pause {
+  order: 1;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+.rmp-volume:hover ~ .rmp-volume-bar,
+.rmp-volume-bar:hover {
+  display: block;
+}
+
+.rmp-volume:hover ~ .rmp-volume-bar ~ .rmp-time,
+.rmp-volume-bar:hover ~ .rmp-time,
+.rmp-time:has(~ .rmp-volume:hover ~ .rmp-volume-bar),
+.rmp-time:has(~ .rmp-volume-bar:hover) {
+  display: none;
+}
+
+/* When one quick rewind or forward are shown */
+.rmp-quick {
+  order: 3;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+/* When both quick rewind AND forward are shown */
+.rmp-quick-both {
+  order: 4;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+.rmp-sm .rmp-quick-both,
+.rmp-sm .rmp-quick,
+.rmp-xs .rmp-quick-both,
+.rmp-xs .rmp-quick {
+  display: none !important;
+}
+
+/* volume */
+.rmp-volume {
+  order: 5;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+.rmp-volume-bar {
+  order: 6;
+  flex-basis: 144px;
+  display: none;
+  cursor: pointer;
+}
+
+/* current time / duration */
+.rmp-time {
+  order: 7;
+  flex-basis: 144px;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.rmp-sm .rmp-volume-bar,
+.rmp-sm .rmp-time,
+.rmp-xs .rmp-volume-bar,
+.rmp-xs .rmp-time {
+  display: none !important;
+}
+
+.rmp-seek-bar {
+  order: 8;
+  flex-grow: 8;
+  padding: 0 8px;
+}
+
+/* multiple audio|captions menu */
+.rmp-captions-ui .rmp-captions {
+  order: 9;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+.rmp-audio-ui .rmp-audio {
+  order: 10;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+.rmp-xs .rmp-captions,
+.rmp-xs .rmp-audio {
+  display: none !important;
+}
+
+/* quality */
+.rmp-quality {
+  order: 11;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+.rmp-quality-hd {
+  font-size: 8px;
+  font-weight: bold;
+  position: absolute;
+  line-height: 8px;
+  padding: 2px;
+  display: none;
+  margin-left: -10px;
+  margin-top: -1px;
+  .optimised-box-shadow-xs();
+  .text-shadow();
+  .border-radius(2px);
+  .font-rmp();
+}
+
+/* fullscreen */
+.rmp-fullscreen {
+  order: 12;
+  flex-grow: 1;
+  flex-basis: 48px;
+}
+
+/* desktop volume UI */
+.rmp-volume-bar:focus {
+  outline: none;
+}
+
+.rmp-volume-bar-sliding-handle {
+  position: absolute;
+  left: 100%;
+  top: -2px;
+  width: 16px;
+  height: 28px;
+  z-index: 1;
+  margin-left: -8px;
+  .optimised-box-shadow-xs(@shadow-4);
+}
+
+.rmp-volume-bar-sliding-area {
+  position: relative;
+  left: 0;
+  top: 12px; 
+  width: 104px;
+  height: 24px;
+  box-shadow: inset 0 0 2px @shadow-4;
+  background: @white-shadow-1;
+}
+
+.rmp-volume-bar-sliding-current-position {
+  position: relative;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* current time in video */
+.rmp-time-separator {
+  padding: 0 4px;
+  display: none;
+}
+
+/* player seek bar */
+
+/* element with slider role will have focus on click
+ so we remove the user agent stylesheet for :focus */
+.rmp-seek-bar:focus {
+  outline: none;
+}
+
+.rmp-seek-bar-sliding-area {
+  position: relative;
+  background: @white-shadow-1;
+  box-shadow: inset 0 0 2px @shadow-4;
+  cursor: pointer;
+}
+
+.rmp-seek-bar-sliding-current-position {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+}
+
+.rmp-seek-bar-sliding-loaded {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: @white-shadow-1;
+  box-shadow: inset 0 0 2px @shadow-4;
+}
+
+.rmp-seek-bar-sliding-handle {
+  position: absolute;
+  top: 50%;
+  margin-left: -8px;
+  margin-top: -14px;
+  width: 16px;
+  height: 28px;
+  z-index: 1;
+  .optimised-box-shadow-xs(@shadow-4);
+}
+
+/* time indicator (hover seek bar) */
+.rmp-indicator {
+  position: absolute;
+  top: -30px;
+  display: none;
+  margin-left: -35px;
+  text-align: center;
+  height: 24px;
+  line-height: 24px;
+  z-index: 999;
+  .unselectable();
+  .optimised-box-shadow-md();
+}
+
+.rmp-xl .rmp-indicator,
+.rmp-lg .rmp-indicator,
+.rmp-md .rmp-indicator {
+  width: 88px;
+}
+
+.rmp-sm .rmp-indicator {
+  width: 64px;
+}
+
+.rmp-xs .rmp-indicator {
+  display: none !important;
+}
+
+/* Seek bar thumbnails */
+.rmp-thumbnails {
+  width: 128px;
+  position: absolute;
+  left: 0;
+}
+
+.rmp-sm.rmp-seek-bar-thumbnails-ui .rmp-indicator {
+  display: none !important;
+}

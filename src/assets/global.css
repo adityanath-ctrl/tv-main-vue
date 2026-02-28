@@ -1,0 +1,124 @@
+/* /src/assets/global.css */
+* {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* For Webkit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 7px;
+  /* width of the vertical scrollbar */
+}
+body .v-overlay__scrim {
+  pointer-events: auto;
+  background: #000!important;;
+
+}
+
+html.lock-scroll,
+body.lock-scroll {
+  overflow: hidden !important;
+  height: 100% !important;
+  overscroll-behavior: none;
+}
+
+#app.lock-scroll {
+  height: 100% !important;
+  overflow: hidden !important;
+  max-width: none !important;
+  padding: 0 !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #111111;
+  /* background color of the scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #BB2025;
+  /* color of the scrollbar thumb */
+  border-radius: 5px;
+  /* border radius for scrollbar */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #BB2025 #111111;
+}
+
+*::-moz-scrollbar-track {
+  background: #111111;
+}
+
+*::-moz-scrollbar-thumb {
+  background: #BB2025;
+  border-radius: 5px;
+  /* border radius for scrollbar */
+}
+
+.d-container {
+  margin-top: 85px;
+}
+
+.single-line-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.v-slide-group__content {
+  display: block !important;
+}
+.v-tab__slider {
+  background: #006497!important;
+}
+
+/* Section for Popups for Entire Web App*/
+.popupHeading {
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+}
+
+.popupSubHeading {
+  padding: 20px 20px 30px !important;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.popupText {
+  font-size: 16px;
+  font-weight: normal;
+  color: #d3d3d3;
+  margin: 0;
+  text-align: center; 
+}
+
+.v-btn.popup-btn {
+  background-color: #F7F5F4 !important;
+  color: #332F2F !important;
+  text-transform: capitalize !important;
+  font-weight: 600 !important;
+  border-radius: 30px !important;
+  padding: 0 20px !important;
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect */
+.v-btn.popup-btn:hover {
+  background-color: #E0DFDE !important; /* slightly different shade */
+  transform: scale(1.05);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Click (active) effect */
+.v-btn.popup-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+  transition: transform 0.1s ease-out;
+}
+
+

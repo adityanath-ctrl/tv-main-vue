@@ -1,0 +1,97 @@
+/* 360 layout */
+
+// this does not work on iOS
+// https://caniuse.com/#feat=css-touch-action
+.rmp-360-ui .rmp-content {
+  touch-action: none;
+}
+
+.rmp-canvas-360 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  .transform-translate();
+}
+
+.rmp-360-nav {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 160px;
+  height: 216px;
+  opacity: 1;
+  visibility: visible;
+  .transition(~"opacity, visibility");
+}
+
+.rmp-md .rmp-360-nav {
+  height: 160px;
+  width: 160px;
+}
+
+.rmp-md .rmp-360-nav-plus,
+.rmp-md .rmp-360-nav-reset,
+.rmp-md .rmp-360-nav-minus {
+  display: none;
+}
+
+.rmp-sm .rmp-360-nav,
+.rmp-xs .rmp-360-nav,
+.rmp-sm .rmp-360-text,
+.rmp-xs .rmp-360-text {
+  display: none !important;
+}
+
+.rmp-360-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 24px;
+  margin-left: -40px;
+  margin-top: -84px;
+  .text-shadow();
+}
+
+.rmp-360-nav-button {
+  width: 48px;
+  height: 48px;
+  position: absolute;
+}
+
+.rmp-360-nav-top {
+  top: 8px;
+  left: 56px;
+}
+
+.rmp-360-nav-bottom {
+  left: 56px;
+  top: 104px;
+}
+
+.rmp-360-nav-left {
+  left: 8px;
+  top: 56px;
+}
+
+.rmp-360-nav-right {
+  left: 104px;
+  top: 56px;
+}
+
+.rmp-360-nav-minus {
+  left: 8px;
+  top: 160px;
+}
+
+.rmp-360-nav-reset {
+  left: 56px;
+  top: 160px;
+}
+
+.rmp-360-nav-plus {
+  left: 104px;
+  top: 160px;
+}

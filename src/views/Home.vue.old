@@ -1,0 +1,163 @@
+<template>
+  <!-- Home -->
+  <v-container fluid style="padding:0px" @click="navigationStateChange()">
+    <v-row class="first_view ma-0 svod-cover-container-mobile">
+      <Slider :FeaturedSlider=FeaturedItems />
+    </v-row>
+    <div class="home-content" style="background-color:black;position: relative;">
+      <v-row v-for="(category, i) in Categories" 
+      :id="`catid-${category.id}`" 
+      class="ma-0">
+        <v-col cols="12" md="6">
+          <h4 class="text-left fcw description-all">{{ category.categoryName }}</h4>
+        </v-col>
+        <v-col cols="6" md="6" class="d-md-flex flex-row-reverse pr-8 view-more">
+          <img class="ml-10 fcw" :src="ViewMoreButton" :style="viewMoreButtonStyle"
+            @click="goToCategoryPage(category.menuCategoryIds, category.menuContentType)" />
+        </v-col>
+        <v-col cols="12" md="12" style="padding: 0 0 0 0;" id="cards_all">
+          <CardEvents :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'LIVE_EVENTS'" />
+          <CardLive :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'LIVE_TV'" />
+          <CardVod :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'SVOD'" />
+          <CardStream :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'LIVE_STREAM'" />
+          <CardSports :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'SPORTS'" />
+        </v-col>
+      </v-row>
+    </div>
+  </v-container>
+</template>
+
+
+<script lang="js">
+import Slider from '../components/Slider.vue';
+import CardEvents from '../components/CardEvents.vue';
+import CardLive from '../components/CardLive.vue';
+import CardVod from '../components/CardVod.vue';
+import CardStream from '../components/CardStream.vue';
+import CardSports from '../components/CardSports.vue';
+import ViewMoreButton from '../assets/img/view-more-button-icon-words-only.svg';
+import { BACKGROUND_COLOR_1, FONT_COLOR_1 } from '@/mainConfig';
+import { getGuestToken, getSVODById } from '@/utils/siberapi';
+export default ({
+  name: 'Home',
+  components: {
+    Slider,
+    CardEvents,
+    CardLive,
+    CardVod,
+    CardStream,
+    CardSports,
+  },
+  data: () => ({
+    open: ['Users'],
+    ViewMoreButton: ViewMoreButton,
+    viewMoreButtonStyle: {
+      'width': '150px',
+      'cursor': 'pointer'
+    },
+  }),
+  mounted() {
+    //console.log('this', this);
+  },
+  computed: {
+    Categories() {
+      let MainMenuTypes = this.$store.state.MenuStore.SideMenus;
+      var categories = MainMenuTypes.length ? MainMenuTypes[0].categories : [];
+      //console.log('categories', categories);
+      return categories;
+    },
+    FeaturedItems() {
+      let MainMenuTypes = this.$store.state.MenuStore.SideMenus;
+      if (MainMenuTypes.length > 0) {
+        //console.log("Home Featured Items", JSON.stringify(MainMenuTypes[0].featured_items, null, 2));
+        return MainMenuTypes[0].featured_items;
+      }
+      return [];
+    }
+  },
+  watch: {
+    Categories(newVal) {
+    },
+    FeaturedItems(newVal) {
+    }
+  },
+  methods: {
+    setRuntime(val) {
+      let hours = 0
+      let minutes = 0
+      if (val > 60) {
+        hours = Math.floor(val / 60)
+        minutes = val % 60
+
+        return hours + 'HR ' + minutes + 'M'
+      } else {
+        return minutes + 'M'
+      }
+    },
+    SliderTypeBycontentType(type = '') {
+      let sliderType = ''
+      switch (type) {
+        case 'svod_movies':
+          sliderType = 'Film'
+          break
+        case 'svod_series':
+          sliderType = 'Series'
+          break
+        case 'events':
+          sliderType = 'Live Stream Event'
+          break
+        case 'sports':
+          sliderType = 'Sports Event'
+          break
+      }
+
+      return sliderType
+    },
+    goToCategoryPage(id, menuContentType) {
+      this.$router.push({ path: '/category/' + id + '/' + menuContentType });
+    },
+    navigationStateChange() {
+      this.$store.dispatch("changeNavigationState", false);
+    }
+  }
+});
+
+</script>
+<style>
+body {
+  overflow: hidden;
+}
+
+.description-all {
+  margin-left: 50px;
+}
+
+@media screen and (max-width: 1024px) {
+  .card-slider {
+    padding-left: 20px !important;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .run-time {
+    display: none;
+  }
+
+  .view-more {
+    visibility: hidden;
+  }
+
+  .description-all {
+    font-size: 16px !important;
+    margin-left: 10px;
+  }
+
+  .d-flex.flex-column.bg-none.live-event.w-100.py-10 {
+    padding: 10px 0 !important;
+  }
+
+  .card-slider {
+    padding-left: 20px !important;
+  }
+}
+</style>

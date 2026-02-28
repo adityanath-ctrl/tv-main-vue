@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+  <title>Radiant Media Player - HTML5 video advertisement example (Google IMA)</title>
+</head>
+
+<body>
+  <!-- Radiant Media Player core library -->
+  <script src="../dist/rmp.min.js"></script>
+  <!-- Player container -->
+  <div id="rmp"></div>
+  <script>
+    // Player settings
+    const src = {
+      mp4: [
+        'https://your-mp4-url.mp4'
+      ]
+    };
+    const settings = {
+      // Enter your license key
+      licenseKey: 'your-license-key',
+      src: src,
+      width: 640,
+      height: 360,
+      pathToRmpFiles: '../',
+      contentMetadata: {
+        poster: [
+          'https://your-poster-url.jpg'
+        ]
+      },
+      // video ads settings
+      ads: true,
+      adParser: 'ima',
+      adTagUrl: 'https://your-ad-tag-url',
+      adTagWaterfall: [
+        'https://your-ad-tag-fallback-url-1',
+        'https://your-ad-tag-fallback-url-2'
+      ]
+    };
+
+    // Init player function
+    async function initPlayer() {
+      try {
+        await rmp.init(settings);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    const elementID = 'rmp';
+    const rmp = new RadiantMP(elementID);
+    initPlayer();
+  </script>
+</body>
+
+</html>

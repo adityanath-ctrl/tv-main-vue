@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+  <title>Radiant Media Player - Example custom element</title>
+</head>
+
+<body>
+  <script type="application/json" id="rmp-settings">
+{
+  "jsPlayerUri": "../dist/wc.rmp.min.js",
+  "cssPlayerUri": "../dist/wc.rmp.min.css",
+  "licenseKey": "your-license-key", 
+  "pathToRmpFiles": "../",
+  "src": {"hls": "https://your-hls-url.m3u8"},
+  "width": 640,
+  "height": 360
+}
+</script>
+  <radiant-media-player data-id="rmp" data-settings-id="rmp-settings"></radiant-media-player>
+  <script src="../dist/rmp.custom-element.min.js"></script>
+</body>
+
+</html>

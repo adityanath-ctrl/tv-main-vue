@@ -1,0 +1,50 @@
+/**
+ * This section applies to FCC settings in the CC menu
+ */
+
+.rmp-module-fcc-settings {
+  min-width: 288px;
+  height: 48px;
+  line-height: 40px;
+  margin: 8px 0;
+  border: 3px solid;
+  font-size: 18px;
+  background: none;
+  cursor: pointer;
+  .font-rmp();
+  .transition(~"color, border-color");
+  .text-ellipsis();
+}
+
+.rmp-sm .rmp-module-fcc-settings,
+.rmp-xs .rmp-module-fcc-settings {
+  min-width: 192px;
+}
+
+.rmp-module-fcc-settings-default {
+  margin-top: 20px;
+}
+
+.rmp-overlay-fcc-settings-area .rmp-select {
+  display: block;
+  text-align: center;
+  text-transform: capitalize;
+  padding: 2px;
+  color: @black;
+  .border-radius(4px);
+}
+
+.rmp-overlay-fcc-settings-area .rmp-option {
+  text-transform: capitalize;
+}
+
+.rmp-module-overlay .rmp-overlay-fcc-settings-area label {
+  display: block;
+  text-align: center;
+  margin: 12px 0 6px;
+}
+
+.rmp-xl .rmp-module-overlay .rmp-overlay-fcc-settings-area label,
+.rmp-xl .rmp-overlay-fcc-settings-area .rmp-select {
+  font-size: 18px;
+}
