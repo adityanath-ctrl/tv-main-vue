@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, computed, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, reactive, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import NavigationBar from './components/NavigationBar.vue';
 import TopBar from './components/TopBar.vue';
@@ -47,6 +47,9 @@ import { useUIStore } from './store/useUIStore';
 import PackageStatus from './components/PackageStatus.vue';
 import LimitExceededPopup from './components/popups/limitExceededPopup.vue';
 import EnterCodeFlow from './components/EnterCodeFlow.vue'; 
+import { useFocusStore } from './store/useFocusStore';
+
+const focusStore = useFocusStore();
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -130,6 +133,7 @@ watch(tokenMode, () => { }, { immediate: true });
 
 onMounted(() => {
   document.title = SITE_TITLE || '';
+  window.addEventListener('keydown', handleGlobalKeyDown);
   // Initial authentication is handled by main.ts
   // This watcher is for any App.vue specific logic after store is initially loaded/updated
   watch(() => authStore.getLoadingState, (isLoading) => {
@@ -138,6 +142,33 @@ onMounted(() => {
     }
   }, { immediate: true });
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleGlobalKeyDown);
+});
+
+const handleGlobalKeyDown = (e) => {
+  // Navigation drawer toggle
+  if (e.key === 'm' || e.key === 'M') {
+    changeNavigationState(!showNavigationBar.value);
+    return;
+  }
+
+  // If sidebar is open
+  if (showNavigationBar.value) {
+    if (e.key === 'ArrowRight') {
+      changeNavigationState(false);
+      e.preventDefault();
+    }
+    return;
+  }
+
+  // Global transitions (Backup if component doesn't catch it)
+  if (e.key === 'ArrowLeft' && !showNavigationBar.value) {
+    changeNavigationState(true);
+    e.preventDefault();
+  }
+};
 
 const onShowModal = () => {
   isShowPackageModal.value = true;

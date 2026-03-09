@@ -92,6 +92,9 @@ import { useDisplay } from 'vuetify';
 import useNavigationStore from '@/store/useNavigationStore';
 import useLiveStore from '@/store/useLiveStore';
 import useAuthStore from '@/store/useAuthStore';
+import { useFocusStore } from '@/store/useFocusStore';
+
+const focusStore = useFocusStore();
 
 const { mobile: isMobile } = useDisplay();
 const router = useRouter();
@@ -217,14 +220,14 @@ const processMenuData = (currentMenuIdParam, currentSubMenuIdParam) => {
     const layout = activeMenuItem.menuItemLayout || activeMenuItem.subMenuItemLayout;
 
     if (layout === 'TV_Layout_1') {
-      if (!isEPG.value) {
-        isEPG.value = true;
-        needsEPGCall = true;
-      }
+      isEPG.value = true;
+      needsEPGCall = true;
+      focusStore.setFocusSection('epg');
       Categories.value = [];
       if (mainContextChanged) emptyCategoryRowIds.value = [];
     } else {
       isEPG.value = false;
+      focusStore.setFocusSection(activeMenuItem.featured_items?.length ? 'slider' : 'row');
       FeaturedItems.value = activeMenuItem.featured_items?.length ? activeMenuItem.featured_items : [];
       if (activeMenuItem.categories?.length) {
         Categories.value = [...activeMenuItem.categories].sort((a, b) => (a.position || 0) - (b.position || 0));

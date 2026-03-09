@@ -1,6 +1,8 @@
 <!-- /src/components/cards/CardVod.vue -->
 <template>
-  <div class="d-flex flex-column bg-none w-100" :class="paddingClass" @click="onClickSVOD(item.id, item.is_series)"
+  <div class="d-flex flex-column bg-none w-100 focusable-item" :class="[paddingClass, { 'kb-focused': isFocused }]" 
+    @click="onClickSVOD(item.id, item.is_series)"
+    @mouseenter="$emit('focus')"
     style="cursor: pointer">
     <div class="slider-img-container">
       <img :src="item.poster_url" :title="item.caption" class="card-img" />
@@ -30,10 +32,13 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  // ADDED: Accept the categoryName prop
   categoryName: {
     type: String,
     default: 'movies' // Default to 'movies' if not provided
+  },
+  isFocused: {
+    type: Boolean,
+    default: false
   }
 });
 

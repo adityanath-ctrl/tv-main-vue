@@ -94,7 +94,12 @@
             }"
             @click="playCurrentProgramByChannelId(item.channel.id)"
           >
-            <div class="channel-logo-container">
+            <div
+              class="channel-logo-container focusable-item"
+              :class="{ 'kb-focused': isEPGFocused && activeChannelIndex === channelIndex && activeProgramIndex === -1 }"
+              @click="onChannelClick(item.channel)"
+              @mouseenter="onMouseEnterChannel(channelIndex)"
+            >
               <img
                 :src="item.channel.icon_url"
                 :alt="item.channel.name"
@@ -125,10 +130,13 @@
                   :style="{ top: `${channelIndex * (programHeight + 5)}px` }"
                 >
                   <div
-                    v-for="program in item.programs"
+                    v-for="(program, programIndex) in item.programs"
                     :key="program.programme_id"
-                    class="program-card"
-                    :class="{ selected: selectedProgramUUID === program.uuid }"
+                    class="program-card focusable-item"
+                    :class="{ 
+                      selected: selectedProgramUUID === program.uuid,
+                      'kb-focused': isEPGFocused && activeChannelIndex === channelIndex && activeProgramIndex === programIndex
+                    }"
                     :style="{
                       height: `${programHeight}px`,
                       width: `${getProgramWidth(program)}px`,
@@ -136,6 +144,7 @@
                       left: `${getProgramLeft(program)}px`
                     }"
                     @click="playProgram(item, program)"
+                    @mouseenter="onMouseEnterProgram(channelIndex, programIndex)"
                   >
                     <div v-if="program.icon_poster && getProgramWidth(program) > 150" style="height: 80%; width: 80px; margin-right: 5px;">
                       <img :src="program.icon_poster" width="100%" height="100%" style="object-fit: contain;" :alt="program.progName" />
@@ -178,6 +187,7 @@ import useEPGStore from "@/store/useEPGStore";
 import useNavigationStore from "@/store/useNavigationStore";
 import LockImage from "@/assets/img/lock_icon_white.svg";
 import MediaPlayer from "@/components/MediaPlayer.vue";
+import { useFocusStore } from "@/store/useFocusStore";
 
 const KEY_EPG_LAST_CATEGORY_ID = "KEY_EPG_LAST_CATEGORY_ID";
 const KEY_LAST_CHANNEL_ID = "KEY_LAST_CHANNEL_ID";
@@ -281,6 +291,11 @@ export default {
       BACKGROUND_COLOR_1, BACKGROUND_COLOR_2, HIGHLIGHT_COLOR_1, HIGHLIGHT_COLOR_2, FONT_COLOR_1,
       // now/next for MediaPlayer
       nowNextPrograms, nowNextLoading,
+      // Focus
+      focusStore: useFocusStore(),
+      isEPGFocused: computed(() => useFocusStore().activeSection === 'epg'),
+      activeChannelIndex: computed({ get: () => useFocusStore().epgChannelIndex, set: (v) => useFocusStore().epgChannelIndex = v }),
+      activeProgramIndex: computed({ get: () => useFocusStore().epgProgramIndex, set: (v) => useFocusStore().epgProgramIndex = v }),
     };
   },
 
@@ -381,6 +396,12 @@ export default {
       navigationStore.changeNavigationState(false);
     },
 
+    onChannelClick(channel) {
+      if (channel?.id) {
+        this.playCurrentProgramByChannelId(channel.id);
+      }
+    },
+
     getHours(timeMs, i) {
       const date = new Date(timeMs);
       date.setHours(date.getHours() + i);
@@ -443,6 +464,115 @@ export default {
         }, sameChannel ? 500 : 800);
       }
     },
+
+    handleKeyDown(e) {
+      if (this.hasNotStartedDialog) {
+        if (e.key === 'Enter' || e.key === 'Escape') this.hasNotStartedDialog = false;
+        return;
+      }
+
+      const navigationStore = useNavigationStore();
+      if (navigationStore.getNavigationState) return;
+
+      const channels = this.epgChannelListMapFiltered;
+      if (!channels.length) return;
+
+      const currentChannelRow = channels[this.activeChannelIndex];
+      const programs = currentChannelRow?.programs || [];
+
+      if (e.key === 'ArrowRight') {
+        if (this.activeProgramIndex < programs.length - 1) {
+          this.activeProgramIndex++;
+          this.scrollProgramIntoView();
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (this.activeProgramIndex > -1) {
+          this.activeProgramIndex--;
+          this.scrollProgramIntoView();
+          e.preventDefault();
+          e.stopPropagation();
+        } else {
+          // Open Sidebar
+          navigationStore.changeNavigationState(true);
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      } else if (e.key === 'ArrowUp') {
+        if (this.activeChannelIndex > 0) {
+          const oldIndex = this.activeChannelIndex;
+          this.activeChannelIndex--;
+          this.syncProgramIndexToTime(channels[this.activeChannelIndex], 'ArrowUp');
+          this.scrollProgramIntoView();
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      } else if (e.key === 'ArrowDown') {
+        if (this.activeChannelIndex < channels.length - 1) {
+          const oldIndex = this.activeChannelIndex;
+          this.activeChannelIndex++;
+          this.syncProgramIndexToTime(channels[this.activeChannelIndex], 'ArrowDown');
+          this.scrollProgramIntoView();
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      } else if (e.key === 'Enter') {
+        if (this.activeProgramIndex === -1) {
+          this.onChannelClick(currentChannelRow.channel);
+        } else {
+          const program = programs[this.activeProgramIndex];
+          if (program) this.playProgram(currentChannelRow, program);
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+
+    syncProgramIndexToTime(newRow, direction) {
+      const prevRowIndex = direction === 'ArrowUp' ? this.activeChannelIndex + 1 : this.activeChannelIndex - 1;
+      const prevRow = this.epgChannelListMapFiltered[prevRowIndex];
+      const prevProgram = prevRow?.programs?.[this.activeProgramIndex];
+      
+      if (this.activeProgramIndex === -1) return; // Stay on logo
+      if (!prevProgram) {
+        this.activeProgramIndex = (newRow.programs || []).findIndex(p => p.progStart_time <= Date.now() && p.progStop_time > Date.now());
+        if (this.activeProgramIndex === -1) this.activeProgramIndex = 0;
+        return;
+      }
+
+      const midTime = (prevProgram.progStart_time + prevProgram.progStop_time) / 2;
+      const closestIndex = (newRow.programs || []).findIndex(p => p.progStart_time <= midTime && p.progStop_time > midTime);
+      if (closestIndex !== -1) {
+        this.activeProgramIndex = closestIndex;
+      } else {
+        // Fallback: stay on same index if within bounds
+        this.activeProgramIndex = Math.min(this.activeProgramIndex, (newRow.programs?.length || 1) - 1);
+      }
+    },
+
+    onMouseEnterChannel(channelIndex) {
+      if (this.focusStore.activeSection !== 'epg') this.focusStore.setFocusSection('epg');
+      this.activeChannelIndex = channelIndex;
+      this.activeProgramIndex = -1; // -1 means logo
+    },
+
+    scrollProgramIntoView() {
+      nextTick(() => {
+        const activeCard = this.$el.querySelector('.kb-focused');
+        if (activeCard) {
+          activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      });
+    },
+
+    onMouseEnterProgram(channelIndex, programIndex) {
+      if (this.focusStore.activeSection !== 'epg') {
+        this.focusStore.setFocusSection('epg');
+      }
+      this.activeChannelIndex = channelIndex;
+      this.activeProgramIndex = programIndex;
+    }
   },
 
   async mounted() {
@@ -491,9 +621,22 @@ export default {
       ro.observe(this.$refs.epgPlayerRef);
       this._epgRO = ro;
     }
+
+    window.addEventListener('keydown', this.handleKeyDown);
+
+    // Initial EPG focus if active section says so
+    if (this.focusStore.activeSection === 'epg') {
+      // If nothing focused yet, focus current program of first channel
+      if (this.activeChannelIndex === 0 && this.activeProgramIndex === 0) {
+        const firstRow = this.epgChannelListMapFiltered[0];
+        if (firstRow) this.syncProgramIndexToTime(firstRow, 'initial');
+      }
+      this.scrollProgramIntoView();
+    }
   },
 
   beforeUnmount() {
+    window.removeEventListener('keydown', this.handleKeyDown);
     if (this.intervalId) clearInterval(this.intervalId);
     window.removeEventListener("resize", this.measure);
     if (this._epgRO) { this._epgRO.disconnect(); this._epgRO = null; }

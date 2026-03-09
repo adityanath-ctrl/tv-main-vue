@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column bg-none live-event w-100" :class="[isViewMore ? 'py-3' : 'pb-10 pt-2']"
+  <div class="d-flex flex-column bg-none live-event w-100 focusable-item" :class="[isViewMore ? 'py-3' : 'pb-10 pt-2', { 'kb-focused': isFocused }]"
     @click="handleCardClick()" style="cursor: pointer">
     <div class="slider-img-container">
       <img :src="item.live_event_image_wide" class="card-top-img event-vod-img" />
@@ -81,7 +81,8 @@ import { useUIStore } from '@/store/useUIStore'; // ADDED
 
 const props = defineProps({
   item: { type: Object, required: true },
-  isViewMore: { type: Boolean, default: false }
+  isViewMore: { type: Boolean, default: false },
+  isFocused: { type: Boolean, default: false }
 })
 
 // --- State and Stores ---

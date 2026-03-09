@@ -18,13 +18,12 @@
           @click="goToCategoryPage(category.menuCategoryIds, category.menuContentType)" />
       </v-col>
       <v-col cols="12" md="12">
-        <CardEvents :categoryId="category.menuCategoryIds" v-if="category.menuContentType == 'LIVE_EVENTS'"
+        <CardEvents :categoryId="category.menuCategoryIds" :rowIndex="i" v-if="category.menuContentType == 'LIVE_EVENTS'"
           @no-events="handleNoEvents" />
-        <!-- <pre>{{ category.menuCategoryIds }}</pre> -->
-        <CardLive :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'LIVE_TV'" />
-        <CardVod :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'SVOD'" />
-        <CardStream :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'LIVE_STREAM'" />
-        <CardSports :categoryId=category.menuCategoryIds v-if="category.menuContentType == 'SPORTS'" />
+        <CardLive :categoryId="category.menuCategoryIds" :rowIndex="i" v-if="category.menuContentType == 'LIVE_TV'" />
+        <CardVod :categoryId="category.menuCategoryIds" :rowIndex="i" v-if="category.menuContentType == 'SVOD'" />
+        <CardStream :categoryId="category.menuCategoryIds" :rowIndex="i" v-if="category.menuContentType == 'LIVE_STREAM'" />
+        <CardSports :categoryId="category.menuCategoryIds" :rowIndex="i" v-if="category.menuContentType == 'SPORTS'" />
       </v-col>
     </v-row>
 
@@ -46,6 +45,9 @@ import CardVod from '../components/card-rows/CardVodRow.vue';
 import CardStream from '../components/CardStream.vue';
 import CardSports from '../components/CardSports.vue';
 import ViewMoreButton from '../assets/img/view-more-button-icon-words-only.svg';
+
+import { useFocusStore } from '@/store/useFocusStore';
+const focusStore = useFocusStore();
 
 export default ({
   name: 'DynamicHomeSub',
@@ -96,7 +98,9 @@ export default ({
           // EPG
           this.$store.dispatch("getChannelCategories");
           this.isEPG = true;
+          focusStore.setFocusSection('epg');
         } else {
+          focusStore.setFocusSection('slider');
           // Featured Items
           if (data.featured_items?.length) {
             this.FeaturedItems = data.featured_items

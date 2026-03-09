@@ -124,3 +124,22 @@ body.lock-scroll {
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
   transition: transform 0.1s ease-out;
 }
+
+/* Keyboard focus highlight — used across the entire app */
+.focusable-item {
+  outline: none !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.kb-focused {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px #00ffcc !important;
+  outline: 4px solid #00ffcc !important;
+  outline-offset: 2px;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 8px;
+  /* Slightly tighter for cards */
+  z-index: 9999 !important;
+  /* Extremely high to stay above everything */
+  position: relative;
+}

@@ -139,10 +139,20 @@ const getFlatIndex = (parentIndex, subIndex) => {
 };
 
 const handleKeyDown = (e) => {
+  // Only handle keys if sidebar is open
+  if (!navigationStore.getNavigationState) return;
+
   if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key)) return;
 
   const total = flatItems.value.length;
   if (total === 0) return;
+
+  if (e.key === 'ArrowRight') {
+    // If pressing Right on the sidebar, close it and move to main content
+    navigationStore.changeNavigationState(false);
+    e.preventDefault();
+    return;
+  }
 
   e.preventDefault();
 

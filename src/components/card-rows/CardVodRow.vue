@@ -17,10 +17,20 @@
       class="item no-border bg-none subscription-item"
     >
       <!-- Regular VOD card -->
-      <CardVod v-if="item.__kind !== 'viewAll'" :item="item" />
+      <CardVod 
+        v-if="item.__kind !== 'viewAll'" 
+        :item="item" 
+        :isFocused="isRowFocused && activeCardIndex === index"
+        @focus="onCardFocus(index)"
+      />
 
       <!-- 15th 'View All' card (wrapped with same padding as CardVod) -->
-      <div v-else class="d-flex flex-column bg-none w-100 pb-10 pt-2" @click="goToViewAll">
+      <div 
+        v-else 
+        class="d-flex flex-column bg-none w-100 pb-10 pt-2 focusable-item" 
+        :class="{ 'kb-focused': isRowFocused && activeCardIndex === index }"
+        @click="goToViewAll"
+      >
         <div class="view-all-card" title="View All">
           <div class="view-all-card__inner">View All</div>
         </div>
@@ -64,6 +74,7 @@ const props = withDefaults(defineProps<{
   menuContentType?: string;
   menuType?: string;
   categoryName?: string;
+  rowIndex?: number;
 }>(), {
   items: () => [],
   categoryId: null,
@@ -71,16 +82,30 @@ const props = withDefaults(defineProps<{
   title: '',
   menuContentType: 'SVOD',
   menuType: '',
-  categoryName: ''
+  categoryName: '',
+  rowIndex: 0
 });
 
 const emit = defineEmits<{ (e: 'no-content', uniqueRowId: number | string | null): void }>();
+
+import { useFocusStore } from '@/store/useFocusStore';
+import useNavigationStore from '@/store/useNavigationStore';
+import { useRowNavigation } from '@/composition-api/useKeyboardNavigation';
 
 const router = useRouter();
 const svodStore = useSVODStore();
 
 const swiperRefInternal = ref<SwiperClass | null>(null);
+
+const { isRowFocused, activeCardIndex } = useRowNavigation(props, displayItems, swiperRefInternal);
 const isLoadingData = ref(true);
+
+function onCardFocus(index: number) {
+  const focusStore = useFocusStore();
+  focusStore.setFocusSection('row');
+  focusStore.activeRowIndex = props.rowIndex || 0;
+  focusStore.activeCardIndex = index;
+}
 
 function onSwiperInitialized(swiper: SwiperClass) {
   swiperRefInternal.value = swiper;

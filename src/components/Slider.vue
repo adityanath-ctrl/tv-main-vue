@@ -66,11 +66,12 @@
               >
                 <!-- Play -->
                 <v-btn
-                  class="slider-action-btn slider-play-btn"
-                  @mouseenter="isPlayHovered = true"
+                  class="slider-action-btn slider-play-btn focusable-item"
+                  :class="{ 'kb-focused': isSliderFocused && focusedButtonIndex === 0 }"
+                  @mouseenter="onButtonHover(0)"
                   @mouseleave="isPlayHovered = false"
                   @click="onGoPlayer(item, 'play')"
-                  :style="{ background: isPlayHovered ? HIGHLIGHT_COLOR_2 : HIGHLIGHT_COLOR_1 }"
+                  :style="{ background: (isPlayHovered || (isSliderFocused && focusedButtonIndex === 0)) ? HIGHLIGHT_COLOR_2 : HIGHLIGHT_COLOR_1 }"
                 >
                   <v-icon start>mdi-play</v-icon>
                   Play
@@ -79,17 +80,24 @@
                 <!-- See Details -->
                 <v-btn
                   v-if="item.contentType === 'svod_movies' || item.contentType === 'svod_series'"
-                  class="slider-action-btn slider-details-btn"
-                  @mouseenter="isDetailsHovered = true"
+                  class="slider-action-btn slider-details-btn focusable-item"
+                  :class="{ 'kb-focused': isSliderFocused && focusedButtonIndex === 1 }"
+                  @mouseenter="onButtonHover(1)"
                   @mouseleave="isDetailsHovered = false"
                   @click="onGoPlayer(item, 'details')"
-                  :style="{ background: isDetailsHovered ? 'rgba(70, 70, 70, 0.9)' : 'rgba(100, 100, 100, 0.7)' }"
+                  :style="{ background: (isDetailsHovered || (isSliderFocused && focusedButtonIndex === 1)) ? 'rgba(70, 70, 70, 0.9)' : 'rgba(100, 100, 100, 0.7)' }"
                 >
                   See Details
                 </v-btn>
 
                 <!-- Mute toggle only in video mode -->
-                <v-btn v-if="usesVideo" class="mute-btn" icon variant="tonal" @click="toggleMute">
+                <v-btn v-if="usesVideo" 
+                  class="mute-btn focusable-item" 
+                  :class="{ 'kb-focused': isSliderFocused && focusedButtonIndex === (item.contentType?.includes('svod') ? 2 : 1) }"
+                  icon variant="tonal" 
+                  @click="toggleMute"
+                  @mouseenter="onButtonHover(item.contentType?.includes('svod') ? 2 : 1)"
+                >
                   <v-icon>{{ isVideoMuted ? 'mdi-volume-off' : 'mdi-volume-high' }}</v-icon>
                 </v-btn>
               </div>
@@ -112,6 +120,17 @@ import Preloader from './Preloader.vue';
 import { getMovieDetail, getEventDetail, getSVODSeriesById } from "@/utils/siberAPI";
 import { HIGHLIGHT_COLOR_1, HIGHLIGHT_COLOR_2 } from '@/mainConfig';
 import useAuthStore from "@/store/useAuthStore";
+import useNavigationStore from "@/store/useNavigationStore";
+import { useFocusStore } from "@/store/useFocusStore";
+
+const navigationStore = useNavigationStore();
+const focusStore = useFocusStore();
+
+const isSliderFocused = computed(() => focusStore.activeSection === 'slider');
+const focusedButtonIndex = computed({
+  get: () => focusStore.sliderButtonIndex,
+  set: (val) => focusStore.sliderButtonIndex = val
+});
 
 const { FeaturedSlider } = defineProps({
   FeaturedSlider: { type: Array, required: true },
@@ -192,11 +211,65 @@ onMounted(() => {
   toggleDescriptionVisibility();
   updateSliderItems();
   window.addEventListener('resize', updatePhoneWidth);
+  window.addEventListener('keydown', handleKeyDown);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updatePhoneWidth);
+  window.removeEventListener('keydown', handleKeyDown);
 });
+
+const onButtonHover = (index) => {
+  if (focusStore.activeSection !== 'slider') {
+    focusStore.setFocusSection('slider');
+  }
+  focusedButtonIndex.value = index;
+  if (index === 0) isPlayHovered.value = true;
+  if (index === 1) isDetailsHovered.value = true;
+};
+
+const handleKeyDown = (e) => {
+  // If Navigation Bar is open, don't handle keys here
+  if (navigationStore.getNavigationState) return;
+
+  const buttonsCount = SliderItems.value[currentSlide.value]?.contentType?.includes('svod') ? (usesVideo.value ? 3 : 2) : (usesVideo.value ? 2 : 1);
+
+  if (e.key === 'ArrowRight') {
+    if (focusedButtonIndex.value < buttonsCount - 1) {
+      focusedButtonIndex.value++;
+      e.preventDefault();
+    } else {
+      // Go to next slide
+      currentSlide.value = (currentSlide.value + 1) % SliderItems.value.length;
+      focusedButtonIndex.value = 0;
+      e.preventDefault();
+    }
+  } else if (e.key === 'ArrowLeft') {
+    if (focusedButtonIndex.value > 0) {
+      focusedButtonIndex.value--;
+      e.preventDefault();
+    } else {
+      // Reached the far left -> open sidebar
+      navigationStore.changeNavigationState(true);
+      e.preventDefault();
+    }
+  } else if (e.key === 'ArrowDown') {
+    // Jump to the first row
+    focusStore.setFocusSection('row');
+    focusStore.activeRowIndex = 0;
+    e.preventDefault();
+  } else if (e.key === 'Enter') {
+    const item = SliderItems.value[currentSlide.value];
+    if (focusedButtonIndex.value === 0) {
+      onGoPlayer(item, 'play');
+    } else if (focusedButtonIndex.value === 1 && item.contentType?.includes('svod')) {
+      onGoPlayer(item, 'details');
+    } else if (focusedButtonIndex.value === (item.contentType?.includes('svod') ? 2 : 1) && usesVideo.value) {
+      toggleMute();
+    }
+    e.preventDefault();
+  }
+};
 
 const toggleDescriptionVisibility = () => {
   showDescription.value = true;

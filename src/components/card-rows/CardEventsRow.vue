@@ -19,7 +19,7 @@
       :key="item.id || idx"
       class="item no-border bg-none subscription-item"
     >
-      <CardEvents :item="item" />
+      <CardEvents :item="item" :isFocused="isRowFocused && activeCardIndex === idx" />
     </swiper-slide>
 
         <template #button-prev>
@@ -46,6 +46,10 @@ import 'swiper/css/mousewheel';
 import CardEvents from '@/components/cards/CardEvents.vue';
 import useEventsStore from '@/store/useEventsStore';
 import { eventsBreakpoints } from '@/utils/constants';
+import { useRowNavigation } from '@/composition-api/useKeyboardNavigation';
+
+const swiperRefInternal = ref<any>(null);
+const { isRowFocused, activeCardIndex } = useRowNavigation(props, computed(() => liveEvents.value), swiperRefInternal);
 
 const props = defineProps({
   categoryId: { type: Number as PropType<number>, required: true }, // Content fetching ID
@@ -53,6 +57,7 @@ const props = defineProps({
     type: [Number, String] as PropType<number | string>, // Explicitly type for PropType
     required: true,
   },
+  rowIndex: { type: Number, default: 0 }
 });
 
 const emit = defineEmits<{
