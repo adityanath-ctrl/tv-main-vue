@@ -4,27 +4,40 @@
     style="color: #fff; box-shadow: 0px 0px 0px 0px; border: 0px; top: 0px; padding-top: 105px; padding-left: 20px; padding-right: 10vw; height: 100vh"
     :style="showMenuBar ? backgroundStyle_show : backgroundStyle_hide">
     <v-list nav :style="navStyle">
-      <!-- Dynamically generated menu items from API -->
       <template v-for="(menuItem, index) in menuItems" :key="menuItem.id">
+
         <v-list-group
           v-if="menuItem.menuType === 'SUB_MENU_ITEMS' && menuItem.sub_menu_items && menuItem.sub_menu_items.length > 0"
           :value="menuItem.id">
           <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" tabindex="0" ref="setMenuRef" class="mb-3 focusable-item"
+            <v-list-item
+              v-bind="props"
+              class="mb-3 focusable-item"
+              :class="{ 'kb-focused': getFlatIndex(index, null) === focusedIndex }"
               :prepend-avatar="getIconUrl(menuItem)"
               :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
-              @click="onClickParentMenu(index, menuItem, true)" :title="menuItem?.menuItemName">
+              @click="onClickParentMenu(index, menuItem, true)"
+              :title="menuItem?.menuItemName">
             </v-list-item>
           </template>
 
-          <v-list-item v-for="(subItem, subIndex) in menuItem.sub_menu_items" :key="subItem.id" tabindex="0"
-            ref="setMenuRef" class="custom-sub-menu-item focusable-item" :prepend-avatar="getIconUrl(subItem, true)"
+          <v-list-item
+            v-for="(subItem, subIndex) in menuItem.sub_menu_items"
+            :key="subItem.id"
+            class="custom-sub-menu-item focusable-item"
+            :class="{ 'kb-focused': getFlatIndex(index, subIndex) === focusedIndex }"
+            :prepend-avatar="getIconUrl(subItem, true)"
             :style="currentRoute == subItem.id ? activeItemStyle : inActiveItemStyle"
-            @click="onClickSubMenu(index, subIndex, subItem)" :title="subItem?.subMenuName">
+            @click="onClickSubMenu(index, subIndex, subItem)"
+            :title="subItem?.subMenuName">
           </v-list-item>
         </v-list-group>
 
-        <v-list-item v-else :key="menuItem.id + '_single'" tabindex="0" ref="setMenuRef" class="mb-3 focusable-item"
+        <v-list-item
+          v-else
+          :key="menuItem.id + '_single'"
+          class="mb-3 focusable-item"
+          :class="{ 'kb-focused': getFlatIndex(index, null) === focusedIndex }"
           :prepend-avatar="getIconUrl(menuItem)"
           :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
           @click="onClickParentMenu(index, menuItem, false)">
@@ -32,13 +45,12 @@
             {{ (!isUserLoggedIn && menuItem.menuItemLayout === 'Log_Out') ? 'Sign In' : menuItem.menuItemName }}
           </v-list-item-title>
         </v-list-item>
-      </template>
 
+      </template>
     </v-list>
 
     <ButtonFlowTemplate :closePopup="closeButtonFlowTemplate" :dialog="buttonFlowTemplatePopupRef"
       :popupContentType="popupContentType">
-      <!-- Slot for the 'sign-in-required' popup -->
       <template #sign-in-required>
         <v-card-title class="d-flex justify-center">
           <h1 class="popupHeading">Log In Required</h1>
@@ -47,16 +59,11 @@
           You must be logged in to access this feature.
         </v-card-text>
         <v-card-actions class="d-flex justify-center align-center">
-          <v-btn outlined color="white" class="popup-btn" @click="closeButtonFlowTemplate">
-            Cancel
-          </v-btn>
-          <v-btn outlined color="white" class="popup-btn" @click="handleSignIn">
-            Login
-          </v-btn>
+          <v-btn outlined color="white" class="popup-btn" @click="closeButtonFlowTemplate">Cancel</v-btn>
+          <v-btn outlined color="white" class="popup-btn" @click="handleSignIn">Login</v-btn>
         </v-card-actions>
       </template>
 
-      <!-- Slot for the 'enter-code' popup -->
       <template #enter-code>
         <v-card-title class="d-flex justify-center">
           <h1 class="popupHeading">Log In Required</h1>
@@ -65,21 +72,16 @@
           Please log in to your account to enter a code.
         </v-card-text>
         <v-card-actions class="d-flex justify-center align-center">
-          <v-btn outlined color="white" class="popup-btn" @click="closeButtonFlowTemplate">
-            Cancel
-          </v-btn>
-          <v-btn outlined color="white" class="popup-btn" @click="handleSignIn">
-            Login
-          </v-btn>
+          <v-btn outlined color="white" class="popup-btn" @click="closeButtonFlowTemplate">Cancel</v-btn>
+          <v-btn outlined color="white" class="popup-btn" @click="handleSignIn">Login</v-btn>
         </v-card-actions>
       </template>
-
     </ButtonFlowTemplate>
   </v-navigation-drawer>
 </template>
 
 <script setup>
-import { ref, computed, reactive, watch, watchEffect, nextTick, onMounted } from 'vue';
+import { ref, computed, reactive, watch, watchEffect, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   FONT_COLOR_1,
@@ -104,52 +106,78 @@ const { instance } = useMsal();
 const uiStore = useUIStore();
 
 const currentRoute = ref("");
-const menuRefs = ref([]);
 const isUserLoggedIn = computed(() => authStore.isUserLoggedIn);
+const showMenuBar = computed(() => navigationStore.getNavigationState);
 
-const setMenuRef = (el) => {
-  if (el) {
-    menuRefs.value.push(el.$el || el);
+// ─── KEYBOARD NAV: pure index tracking, zero DOM focus() calls ───────────────
+const focusedIndex = ref(0);
+
+// Flat ordered list of every nav item (parents + their sub-items in order)
+const flatItems = computed(() => {
+  const result = [];
+  menuItems.value.forEach((menuItem, index) => {
+    const hasSubItems =
+      menuItem.menuType === 'SUB_MENU_ITEMS' &&
+      menuItem.sub_menu_items?.length > 0;
+
+    result.push({ parentIndex: index, subIndex: null, menuItem, subItem: null });
+
+    if (hasSubItems) {
+      menuItem.sub_menu_items.forEach((subItem, subIndex) => {
+        result.push({ parentIndex: index, subIndex, menuItem, subItem });
+      });
+    }
+  });
+  return result;
+});
+
+// Maps (parentIndex, subIndex) → position in flatItems
+const getFlatIndex = (parentIndex, subIndex) => {
+  return flatItems.value.findIndex(
+    (item) => item.parentIndex === parentIndex && item.subIndex === subIndex
+  );
+};
+
+const handleKeyDown = (e) => {
+  if (!['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key)) return;
+
+  const total = flatItems.value.length;
+  if (total === 0) return;
+
+  e.preventDefault();
+
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+    focusedIndex.value = Math.min(focusedIndex.value + 1, total - 1);
+
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    focusedIndex.value = Math.max(focusedIndex.value - 1, 0);
+
+  } else if (e.key === 'Enter') {
+    const item = flatItems.value[focusedIndex.value];
+    if (!item) return;
+    if (item.subItem) {
+      onClickSubMenu(item.parentIndex, item.subIndex, item.subItem);
+    } else {
+      const hasSubItems =
+        item.menuItem.menuType === 'SUB_MENU_ITEMS' &&
+        item.menuItem.sub_menu_items?.length > 0;
+      onClickParentMenu(item.parentIndex, item.menuItem, hasSubItems);
+    }
   }
-}
+};
 
-const focusFirstItem = () => {
-  if ( menuRefs.value.length > 0) {
-    menuRefs.value[0].focus();
-  }
-}
+// Reset to top whenever drawer opens
+watch(showMenuBar, (isOpen) => {
+  if (isOpen) focusedIndex.value = 0;
+});
 
-onMounted(() => {
-  setTimeout(() => {
-    focusFirstItem()
-  }, 300)
-})
+onMounted(() => document.addEventListener('keydown', handleKeyDown));
+onUnmounted(() => document.removeEventListener('keydown', handleKeyDown));
 
-document.addEventListener('keydown', (e) => {
-  const active = document.activeElement
-  const index = menuRefs.value.indexOf(active)
-
-  if (index === -1) return
-
-  if (e.key === 'ArrowDown') {
-    e.preventDefault()
-    console.log("ArrowDown pressed, moving focus to next item", menuRefs.value[index + 1])
-    menuRefs.value[index + 1]?.focus()
-  }
-
-  if (e.key === 'ArrowUp') {
-    e.preventDefault()
-    menuRefs.value[index - 1]?.focus()
-  }
-
-  if (e.key === 'Enter') {
-    active.click()
-  }
-})
-
+// ─── SORTING ─────────────────────────────────────────────────────────────────
 const pos = (x) => {
   const n = Number(x?.position);
-  return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER; // push missing to end
+  return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
 };
 
 const byPosNameId = (getName) => (a, b) => {
@@ -163,9 +191,9 @@ const byPosNameId = (getName) => (a, b) => {
 };
 
 const sortParents = (arr = []) => arr.slice().sort(byPosNameId(i => i.menuItemName));
-const sortSubs = (arr = []) => arr.slice().sort(byPosNameId(i => i.subMenuName || i.menuItemName));
+const sortSubs    = (arr = []) => arr.slice().sort(byPosNameId(i => i.subMenuName || i.menuItemName));
 
-
+// ─── STYLES ──────────────────────────────────────────────────────────────────
 const backgroundStyle_hide = reactive({
   background: "transparent",
   width: "0vw",
@@ -181,50 +209,20 @@ const backgroundStyle_show = reactive({
   transform: "translateX(0%)!important",
 });
 
-const navStyle = reactive({
-  textAlign: "left",
-  color: FONT_COLOR_1,
-});
+const navStyle        = reactive({ textAlign: "left", color: FONT_COLOR_1 });
+const activeItemStyle = reactive({ backgroundColor: HIGHLIGHT_COLOR_1, borderRadius: "25px" });
+const inActiveItemStyle = reactive({ backgroundColor: "", borderLeft: "", borderTopLeftRadius: "", borderBottomLeftRadius: "" });
 
-const activeItemStyle = reactive({
-  backgroundColor: HIGHLIGHT_COLOR_1,
-  borderRadius: "25px",
-});
-
-const inActiveItemStyle = reactive({
-  backgroundColor: "",
-  borderLeft: "",
-  borderTopLeftRadius: "",
-  borderBottomLeftRadius: "",
-});
-
-
+// ─── POPUP ───────────────────────────────────────────────────────────────────
 const buttonFlowTemplatePopupRef = ref(false);
 const popupContentType = ref("");
 const loginButtonDisabled = ref(false);
 
-function closeButtonFlowTemplate() {
-  buttonFlowTemplatePopupRef.value = false;
-}
+function closeButtonFlowTemplate() { buttonFlowTemplatePopupRef.value = false; }
+const closePopup = () => { buttonFlowTemplatePopupRef.value = false; };
+const handleSignIn = () => { closePopup(); if (instance) authStore.loginUser(); };
 
-const closePopup = () => {
-  buttonFlowTemplatePopupRef.value = false
-}
-
-const handleSignIn = () => {
-  closePopup()
-  if (instance) {
-    authStore.loginUser();
-  }
-}
-
-watch(buttonFlowTemplatePopupRef, (newVal) => {
-  if (newVal) {
-    loginButtonDisabled.value = false;
-  }
-});
-
-const showMenuBar = computed(() => navigationStore.getNavigationState);
+watch(buttonFlowTemplatePopupRef, (v) => { if (v) loginButtonDisabled.value = false; });
 
 const menuItems = computed(() => {
   const sideMenus = menuStore.SideMenus || [];
@@ -235,171 +233,68 @@ const menuItems = computed(() => {
 });
 
 const onClickParentMenu = (index, menuItem, isParentGroupClick = false) => {
-  const hasSubItems = menuItem.menuType === 'SUB_MENU_ITEMS' && menuItem.sub_menu_items && menuItem.sub_menu_items.length > 0;
+  const hasSubItems = menuItem.menuType === 'SUB_MENU_ITEMS' && menuItem.sub_menu_items?.length > 0;
 
-  // This outer condition is fine, it correctly handles expandable groups.
   if (!hasSubItems || !isParentGroupClick) {
-    navigationStore.changeNavigationState(false); // Close nav on any item click
-
-    // --- START: RESTRUCTURED LOGIC ---
-    // Create one single, clear chain of logic.
+    navigationStore.changeNavigationState(false);
 
     if (menuItem.menuItemLayout === 'Log_Out') {
-      if (!isUserLoggedIn.value) {
-        console.log("NavigationBar: 'Sign In' clicked. Initiating login.");
-        authStore.loginUser();
-      } else {
-        console.log("NavigationBar: 'Log Out' clicked. Initiating logout.");
-        authStore.logoutUser();
-      }
-    }
-    else if (menuItem.menuItemLayout === "My_Account") {
-      if (isUserLoggedIn.value) {
-        router.push('/my-account');
-      } else {
-        popupContentType.value = "sign-in-required";
-        buttonFlowTemplatePopupRef.value = true;
-      }
-    }
-    else if (menuItem.menuItemLayout === "Enter_Code") {
-      if (isUserLoggedIn.value) {
-        uiStore.openEnterCodePopup();
-      } else {
-        popupContentType.value = "enter-code";
-        buttonFlowTemplatePopupRef.value = true;
-      }
-    }
-    else if (menuItem.menuItemLayout === "View_Code_Package_Status") {
-      if (isUserLoggedIn.value) {
-        // Show PackageStatus component from /components/PackageStatus.vue
-        uiStore.openPackageStatusPopup();
-      } else {
-        popupContentType.value = "sign-in-required";
-        buttonFlowTemplatePopupRef.value = true;
-      }
-    }
-    else if (menuItem.menu_item_external_url) {
+      !isUserLoggedIn.value ? authStore.loginUser() : authStore.logoutUser();
+    } else if (menuItem.menuItemLayout === "My_Account") {
+      isUserLoggedIn.value ? router.push('/my-account') : (() => { popupContentType.value = "sign-in-required"; buttonFlowTemplatePopupRef.value = true; })();
+    } else if (menuItem.menuItemLayout === "Enter_Code") {
+      isUserLoggedIn.value ? uiStore.openEnterCodePopup() : (() => { popupContentType.value = "enter-code"; buttonFlowTemplatePopupRef.value = true; })();
+    } else if (menuItem.menuItemLayout === "View_Code_Package_Status") {
+      isUserLoggedIn.value ? uiStore.openPackageStatusPopup() : (() => { popupContentType.value = "sign-in-required"; buttonFlowTemplatePopupRef.value = true; })();
+    } else if (menuItem.menu_item_external_url) {
       window.open(menuItem.menu_item_external_url, "_blank");
-    }
-    else if (menuItem.id) {
-      // This is default case for all other standard menu items.
+    } else if (menuItem.id) {
       router.push({ path: `/menu/${menuItem.id}` });
     }
-    // --- END: RESTRUCTURED LOGIC ---
   }
 };
 
 const onClickSubMenu = (parentIndex, subIndex, subMenuItem) => {
-  navigationStore.changeNavigationState(false); // Close nav on item click
-
-  if (subMenuItem) {
-    const layoutType = subMenuItem.subMenuItemLayout || subMenuItem.menuItemLayout;
-
-    if (layoutType === "My_Account") {
-      if (isUserLoggedIn.value) {
-        router.push('/my-account');
-      } else {
-        popupContentType.value = "sign-in-required";
-        buttonFlowTemplatePopupRef.value = true;
-      }
-      return;
-    } else if (layoutType === "Enter_Code") {
-      console.log("Enter Code Clicked from onClickSubMenu");
-      if (isUserLoggedIn.value) {
-        uiStore.openEnterCodePopup();
-      } else {
-        popupContentType.value = "enter-code";
-        buttonFlowTemplatePopupRef.value = true;
-      }
-      return;
-    } else if (layoutType === "View_Code_Package_Status") {
-      console.log("View Code Package Status Clicked from onClickSubMenu");
-      if (isUserLoggedIn.value) {
-        // Show PackageStatus component from /components/PackageStatus.vue
-        uiStore.openPackageStatusPopup();
-      } else {
-        popupContentType.value = "sign-in-required";
-        buttonFlowTemplatePopupRef.value = true;
-      }
-      return;
-    }
-
-    if (subMenuItem.menu_item_external_url) {
-      window.open(subMenuItem.menu_item_external_url, "_blank");
-    } else if (menuItems.value[parentIndex]?.id && subMenuItem.id) {
-      router.push({ path: `/menu/${menuItems.value[parentIndex].id}/s/${subMenuItem.id}` });
-    }
-  }
-};
-
-// ... (onClickTopMenuParent, handleTopMenuItemClick, getIconUrl remain the same)
-const onClickTopMenuParent = (menuItem) => {
-  const hasSubItems = menuItem.subItems && menuItem.subItems.length > 0;
-  if (!hasSubItems) {
-    handleTopMenuItemClick(menuItem);
-  }
-  // If it has sub-items, v-list-group handles expansion.
-};
-
-const handleTopMenuItemClick = (item) => {
   navigationStore.changeNavigationState(false);
+  if (!subMenuItem) return;
 
-  if (item.action === 'internal_function') {
-    if (item.name === 'Sign Out') {
-      authStore.logoutUser();
-    } else if (item.name === 'My Account') {
-      if (isUserLoggedIn.value) {
-        router.push('/my-account');
-      } else {
-        popupContentType.value = "sign-in-required";
-        buttonFlowTemplatePopupRef.value = true;
-      }
-    }
-  } else if (item.action && typeof item.action === 'string') {
-    if (item.newtab) {
-      window.open(item.action, '_blank');
-    } else {
-      if (item.action.startsWith('http://') || item.action.startsWith('https://')) {
-        window.location.href = item.action;
-      } else {
-        router.push(item.action);
-      }
-    }
-  } else if (item.path && typeof item.path === 'string') {
-    router.push(item.path);
+  const layoutType = subMenuItem.subMenuItemLayout || subMenuItem.menuItemLayout;
+
+  if (layoutType === "My_Account") {
+    isUserLoggedIn.value ? router.push('/my-account') : (() => { popupContentType.value = "sign-in-required"; buttonFlowTemplatePopupRef.value = true; })();
+    return;
+  } else if (layoutType === "Enter_Code") {
+    isUserLoggedIn.value ? uiStore.openEnterCodePopup() : (() => { popupContentType.value = "enter-code"; buttonFlowTemplatePopupRef.value = true; })();
+    return;
+  } else if (layoutType === "View_Code_Package_Status") {
+    isUserLoggedIn.value ? uiStore.openPackageStatusPopup() : (() => { popupContentType.value = "sign-in-required"; buttonFlowTemplatePopupRef.value = true; })();
+    return;
+  }
+
+  if (subMenuItem.menu_item_external_url) {
+    window.open(subMenuItem.menu_item_external_url, "_blank");
+  } else if (menuItems.value[parentIndex]?.id && subMenuItem.id) {
+    router.push({ path: `/menu/${menuItems.value[parentIndex].id}/s/${subMenuItem.id}` });
   }
 };
 
 const getIconUrl = (menuItem, isSubItem = false) => {
   const layout = isSubItem ? (menuItem.subMenuItemLayout || menuItem.menuItemLayout) : menuItem.menuItemLayout;
-
-  if (!isUserLoggedIn.value && layout === "Log_Out") {
-    return '/assets/img/ic_sign_in_white.png';
-  }
-
+  if (!isUserLoggedIn.value && layout === "Log_Out") return '/assets/img/ic_sign_in_white.png';
   const iconUrl = menuItem?.icon_url || menuItem?.icon;
-  if (iconUrl && !iconUrl.includes('landscape_image_broken.png')) {
-    return iconUrl;
-  }
+  if (iconUrl && !iconUrl.includes('landscape_image_broken.png')) return iconUrl;
   return '';
 };
-
-// SIMPLE FOCUS MANAGEMENT
-onMounted(() => {
-});
 
 watchEffect(() => {
   const routeParams = router.currentRoute.value.params;
   let newRouteId = routeParams.subMenuId || routeParams.menuId;
-
   if (newRouteId) {
     currentRoute.value = String(newRouteId);
   } else if (menuItems.value.length > 0 && router.currentRoute.value.name === 'FeaturedCategoriesRoot') {
-    // Only set to first menu item on root Features page if no specific menuId/subMenuId
     currentRoute.value = String(menuItems.value[0].id);
   }
 });
-
 </script>
 
 <style>
@@ -407,24 +302,17 @@ watchEffect(() => {
   height: 28px !important;
   width: 28px !important;
   min-width: 28px !important;
-  /* margin-right: 12px !important; */
-  /* Default margin might be fine, adjust if needed */
 }
 
 .v-navigation-drawer .v-list .v-list-item .v-list-item__prepend .v-avatar.v-theme--light .v-img .v-img__img {
   height: 100% !important;
   width: 100% !important;
   object-fit: contain !important;
-  /* or cover */
 }
 
-.v-avatar {
-  border-radius: 0 !important;
-}
+.v-avatar { border-radius: 0 !important; }
 
-.v-navigation-drawer__content {
-  min-width: 350px;
-}
+.v-navigation-drawer__content { min-width: 350px; }
 
 nav .v-list-item:hover {
   background-color: #555;
@@ -435,21 +323,20 @@ nav .v-list-item:hover {
   padding-inline-start: calc(var(--v-list-item-padding-start) + 24px) !important;
 }
 
-/** Focussable item  */
-
+/* Keyboard focus highlight — driven by Vue class, NOT :focus pseudo */
 .focusable-item {
-  outline: none;
+  outline: none !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
-.focusable-item:focus {
-  border: 3px solid #00ffcc;
+.focusable-item.kb-focused {
   transform: scale(1.05);
-  background: rgba(255,255,255,0.1);
+  box-shadow: 0 0 15px #00ffcc !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 25px;
 }
 
 @media screen and (min-width: 1025px) {
-  #top_menus {
-    display: none !important;
-  }
+  #top_menus { display: none !important; }
 }
 </style>
