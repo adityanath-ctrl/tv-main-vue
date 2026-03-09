@@ -1,6 +1,6 @@
 <!-- /src/components/cards/CardContinueWatching.vue -->
 <template>
-  <div @click="handleClickedItem(item.id)" class="focusable-item" tabindex="0" style="cursor: pointer;">
+  <div @click="handleClickedItem(item.id)" style="cursor: pointer;">
     <div class="slider-cw-img-container">
       <!-- Premium ribbon for locked content -->
       <img v-if="!item.package_status" :src="PremiumRibbonIcon" class="premium-ribbon" />

@@ -13,8 +13,6 @@ import { EventType, type AuthenticationResult } from '@azure/msal-browser';
 import { CustomNavigationClient } from './router/NavigationClient';
 import useAuthStore from './store/useAuthStore';
 import { changeTimeFormatEST } from './utils/date';
-import { initTVControls } from './tvControls';
-import './utils/webosNavigationTester'; // Import test utility for development
 
 // ——— GLOBAL SWIPER SETUP ———
 import Swiper from 'swiper';
@@ -109,15 +107,4 @@ router.isReady().then(async () => {
   await initializeAppAuthentication();
   app.mount('#app');
 
-  // Start TV Remote Control mappings
-  initTVControls();
-  
-  // Development helper: Log WebOS detection in development mode
-  if (import.meta.env.DEV) {
-    setTimeout(() => {
-      console.log('🎮 WebOS TV Navigation System Initialized');
-      console.log('🧪 Run testWebOSNavigation() in console to test navigation');
-      console.log('📊 Run getNavigationState() in console to see current state');
-    }, 2000);
-  }
 });

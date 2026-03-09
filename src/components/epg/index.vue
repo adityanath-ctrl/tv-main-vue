@@ -84,8 +84,7 @@
           <div
             v-for="(item, channelIndex) in epgChannelListMapFiltered"
             :key="item.channel.id"
-            class="focusable-item"
-            tabindex="0"
+            class="epg-channel-item"
             style="display: flex; justify-content: center; align-items: center; cursor: pointer"
             :style="{
               position: 'absolute',
@@ -128,8 +127,7 @@
                   <div
                     v-for="program in item.programs"
                     :key="program.programme_id"
-                    class="program-card focusable-item"
-                    tabindex="0"
+                    class="program-card"
                     :class="{ selected: selectedProgramUUID === program.uuid }"
                     :style="{
                       height: `${programHeight}px`,

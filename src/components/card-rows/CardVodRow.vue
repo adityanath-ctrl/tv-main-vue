@@ -20,7 +20,7 @@
       <CardVod v-if="item.__kind !== 'viewAll'" :item="item" />
 
       <!-- 15th 'View All' card (wrapped with same padding as CardVod) -->
-      <div v-else class="d-flex flex-column bg-none w-100 pb-10 pt-2 focusable-item" tabindex="0" @click="goToViewAll">
+      <div v-else class="d-flex flex-column bg-none w-100 pb-10 pt-2" @click="goToViewAll">
         <div class="view-all-card" title="View All">
           <div class="view-all-card__inner">View All</div>
         </div>
@@ -46,7 +46,6 @@ import type { Swiper as SwiperClass } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Navigation, Mousewheel } from 'swiper/modules';
 import { useRouter } from 'vue-router';
-import { webOSFocusManager } from '@/utils/webosFocusManager';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -149,12 +148,6 @@ async function maybeFetchFromStore() {
 
 onMounted(() => { 
   maybeFetchFromStore();
-  // Ensure proper focus after component mounts
-  nextTick(() => {
-    setTimeout(() => {
-      webOSFocusManager.refreshSpatialNavigation(200);
-    }, 200);
-  });
 });
 
 watch(
@@ -164,12 +157,6 @@ watch(
     const categoryChanged = newCategoryId !== oldCategoryId;
     if (providedChanged || (!nowProvided && categoryChanged)) {
       await maybeFetchFromStore();
-      // Re-initialize focus after content updates
-      nextTick(() => {
-        setTimeout(() => {
-          webOSFocusManager.refreshSpatialNavigation(100);
-        }, 100);
-      });
     }
   }
 );

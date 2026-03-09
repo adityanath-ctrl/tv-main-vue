@@ -10,22 +10,22 @@
           v-if="menuItem.menuType === 'SUB_MENU_ITEMS' && menuItem.sub_menu_items && menuItem.sub_menu_items.length > 0"
           :value="menuItem.id">
           <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" :prepend-avatar="getIconUrl(menuItem)" class="mb-3 focusable-item" tabindex="0"
+            <v-list-item v-bind="props" tabindex="0" ref="setMenuRef" class="mb-3 focusable-item"
+              :prepend-avatar="getIconUrl(menuItem)"
               :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
               @click="onClickParentMenu(index, menuItem, true)" :title="menuItem?.menuItemName">
             </v-list-item>
           </template>
 
-          <v-list-item v-for="(subItem, subIndex) in menuItem.sub_menu_items" :key="subItem.id"
-            :prepend-avatar="getIconUrl(subItem, true)"
-            class="custom-sub-menu-item focusable-item"
-            tabindex="0"
+          <v-list-item v-for="(subItem, subIndex) in menuItem.sub_menu_items" :key="subItem.id" tabindex="0"
+            ref="setMenuRef" class="custom-sub-menu-item focusable-item" :prepend-avatar="getIconUrl(subItem, true)"
             :style="currentRoute == subItem.id ? activeItemStyle : inActiveItemStyle"
             @click="onClickSubMenu(index, subIndex, subItem)" :title="subItem?.subMenuName">
           </v-list-item>
         </v-list-group>
 
-        <v-list-item v-else :key="menuItem.id + '_single'" :prepend-avatar="getIconUrl(menuItem)" class="mb-3 focusable-item" tabindex="0"
+        <v-list-item v-else :key="menuItem.id + '_single'" tabindex="0" ref="setMenuRef" class="mb-3 focusable-item"
+          :prepend-avatar="getIconUrl(menuItem)"
           :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
           @click="onClickParentMenu(index, menuItem, false)">
           <v-list-item-title>
@@ -95,7 +95,6 @@ import useAuthStore from '@/store/useAuthStore';
 import ButtonFlowTemplate from '@/components/popups/btnFlowTemplate.vue';
 import { useMsal } from '@/composition-api/useMsal';
 import { useUIStore } from '@/store/useUIStore';
-import { webOSFocusManager } from '@/utils/webosFocusManager';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -105,7 +104,48 @@ const { instance } = useMsal();
 const uiStore = useUIStore();
 
 const currentRoute = ref("");
+const menuRefs = ref([]);
 const isUserLoggedIn = computed(() => authStore.isUserLoggedIn);
+
+const setMenuRef = (el) => {
+  if (el) {
+    menuRefs.value.push(el.$el || el);
+  }
+}
+
+const focusFirstItem = () => {
+  if ( menuRefs.value.length > 0) {
+    menuRefs.value[0].focus();
+  }
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    focusFirstItem()
+  }, 300)
+})
+
+document.addEventListener('keydown', (e) => {
+  const active = document.activeElement
+  const index = menuRefs.value.indexOf(active)
+
+  if (index === -1) return
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    console.log("ArrowDown pressed, moving focus to next item", menuRefs.value[index + 1])
+    menuRefs.value[index + 1]?.focus()
+  }
+
+  if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    menuRefs.value[index - 1]?.focus()
+  }
+
+  if (e.key === 'Enter') {
+    active.click()
+  }
+})
 
 const pos = (x) => {
   const n = Number(x?.position);
@@ -123,7 +163,7 @@ const byPosNameId = (getName) => (a, b) => {
 };
 
 const sortParents = (arr = []) => arr.slice().sort(byPosNameId(i => i.menuItemName));
-const sortSubs    = (arr = []) => arr.slice().sort(byPosNameId(i => i.subMenuName || i.menuItemName));
+const sortSubs = (arr = []) => arr.slice().sort(byPosNameId(i => i.subMenuName || i.menuItemName));
 
 
 const backgroundStyle_hide = reactive({
@@ -181,7 +221,7 @@ const handleSignIn = () => {
 watch(buttonFlowTemplatePopupRef, (newVal) => {
   if (newVal) {
     loginButtonDisabled.value = false;
-  } 
+  }
 });
 
 const showMenuBar = computed(() => navigationStore.getNavigationState);
@@ -346,15 +386,6 @@ const getIconUrl = (menuItem, isSubItem = false) => {
 
 // SIMPLE FOCUS MANAGEMENT
 onMounted(() => {
-  nextTick(() => {
-    setTimeout(() => {
-        // Focus first menu item when navigation drawer opens
-        const firstMenuItem = document.querySelector('.v-list-item.focusable-item');
-        if (firstMenuItem && showMenuBar.value) {
-          firstMenuItem.focus();
-        }
-      }, 300);
-  });
 });
 
 watchEffect(() => {
@@ -367,13 +398,6 @@ watchEffect(() => {
     // Only set to first menu item on root Features page if no specific menuId/subMenuId
     currentRoute.value = String(menuItems.value[0].id);
   }
-
-  // SIMPLE FOCUS RESET
-  nextTick(() => {
-    setTimeout(() => {
-      webOSFocusManager.refreshSpatialNavigation(100);
-    }, 100);
-  });
 });
 
 </script>
@@ -411,6 +435,17 @@ nav .v-list-item:hover {
   padding-inline-start: calc(var(--v-list-item-padding-start) + 24px) !important;
 }
 
+/** Focussable item  */
+
+.focusable-item {
+  outline: none;
+}
+
+.focusable-item:focus {
+  border: 3px solid #00ffcc;
+  transform: scale(1.05);
+  background: rgba(255,255,255,0.1);
+}
 
 @media screen and (min-width: 1025px) {
   #top_menus {

@@ -1,6 +1,6 @@
 <!-- /src/components/cards/CardVod.vue -->
 <template>
-  <div class="d-flex flex-column bg-none w-100 focusable-item" tabindex="0" :class="paddingClass" @click="onClickSVOD(item.id, item.is_series)"
+  <div class="d-flex flex-column bg-none w-100" :class="paddingClass" @click="onClickSVOD(item.id, item.is_series)"
     style="cursor: pointer">
     <div class="slider-img-container">
       <img :src="item.poster_url" :title="item.caption" class="card-img" />

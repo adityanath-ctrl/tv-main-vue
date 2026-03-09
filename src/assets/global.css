@@ -8,9 +8,11 @@
   width: 7px;
   /* width of the vertical scrollbar */
 }
+
 body .v-overlay__scrim {
   pointer-events: auto;
-  background: #000!important;;
+  background: #000 !important;
+  ;
 
 }
 
@@ -69,8 +71,9 @@ body.lock-scroll {
 .v-slide-group__content {
   display: block !important;
 }
+
 .v-tab__slider {
-  background: #006497!important;
+  background: #006497 !important;
 }
 
 /* Section for Popups for Entire Web App*/
@@ -94,7 +97,7 @@ body.lock-scroll {
   font-weight: normal;
   color: #d3d3d3;
   margin: 0;
-  text-align: center; 
+  text-align: center;
 }
 
 .v-btn.popup-btn {
@@ -109,7 +112,8 @@ body.lock-scroll {
 
 /* Hover effect */
 .v-btn.popup-btn:hover {
-  background-color: #E0DFDE !important; /* slightly different shade */
+  background-color: #E0DFDE !important;
+  /* slightly different shade */
   transform: scale(1.05);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
@@ -119,36 +123,4 @@ body.lock-scroll {
   transform: scale(0.95);
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
   transition: transform 0.1s ease-out;
-}
-
-/* TV Spatial Navigation Focus Styles */
-:focus,
-.v-btn:focus,
-.v-list-item:focus,
-.v-tab:focus,
-.swiper-slide:focus,
-a:focus,
-button:focus,
-[tabindex]:focus,
-.focusable:focus {
-  outline: 4px solid #BB2025 !important;
-  outline-offset: -2px !important;
-  box-shadow: 0 0 15px rgba(187, 32, 37, 0.8) !important;
-  transform: scale(1.03);
-  transition: all 0.2s ease-in-out;
-  z-index: 100;
-  border-radius: inherit;
-}
-
-/* Turn off outline for the container inputs themselves to avoid double-boxing */
-.v-input:focus {
-  transform: none;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* Media Player internal buttons */
-.rmp-button:focus, .rmp-container:focus {
-  outline-color: #FFF !important;
-  box-shadow: 0 0 10px #FFF !important;
 }
