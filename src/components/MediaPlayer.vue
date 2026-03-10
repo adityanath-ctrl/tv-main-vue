@@ -38,6 +38,7 @@
           :key="playerKey"
           id="rmp-container"
           ref="rmpContainer"
+          tabindex="0"
           :class="{ 'fill-viewport': fullscreenMode }"
           :style="rmpViewportStyle"
         >
@@ -629,15 +630,44 @@ const getStreamUrlForDvr = (url, dvrMinutes, cdnType) => {
   const dvrSeconds = dvrMinutes > 0 ? dvrMinutes * 60 : 7200;
   cdnType = (cdnType || '').toLowerCase();
 
+  console.log('MediaPlayer: DVR URL generation', { url, dvrMinutes, cdnType, dvrSeconds });
+
+  // Flussonic CDN - handle both explicit and implicit detection
   if (cdnType === 'flussonic' && url.includes('index.m3u8')) {
-    return url.replace('index.m3u8', `rewind-${dvrSeconds}.m3u8`);
+    const dvrUrl = url.replace('index.m3u8', `rewind-${dvrSeconds}.ts.m3u8`);
+    console.log('MediaPlayer: Flussonic DVR URL', dvrUrl);
+    return dvrUrl;
   }
+  
+  // Fallback for Flussonic URLs that might not have explicit CDN type
+  if (url.includes('tracks-v2') && url.includes('index.m3u8')) {
+    const dvrUrl = url.replace('index.m3u8', `rewind-${dvrSeconds}.ts.m3u8`);
+    console.log('MediaPlayer: Flussonic v2 DVR URL', dvrUrl);
+    return dvrUrl;
+  }
+  
+  // Handle tracks-v1a1 pattern (seen in error)
+  if (url.includes('tracks-v1') && url.includes('index.m3u8')) {
+    const dvrUrl = url.replace('index.m3u8', `rewind-${dvrSeconds}.ts.m3u8`);
+    console.log('MediaPlayer: Flussonic v1 DVR URL', dvrUrl);
+    return dvrUrl;
+  }
+  
+  // Generic pattern for any index.m3u8
+  if (url.includes('index.m3u8')) {
+    const dvrUrl = url.replace('index.m3u8', `rewind-${dvrSeconds}.ts.m3u8`);
+    console.log('MediaPlayer: Generic DVR URL', dvrUrl);
+    return dvrUrl;
+  }
+  
   if (cdnType === 'wmspanel' && url.includes('playlist_dvr.m3u8')) {
     return url.replace('playlist_dvr.m3u8', `playlist_dvr_timeshift-0-${dvrSeconds}.m3u8`);
   }
   if (url.includes('playlist_dvr.m3u8')) {
     return url.replace('playlist_dvr.m3u8', `playlist_dvr_timeshift-0-${dvrSeconds}.m3u8`);
   }
+  
+  console.log('MediaPlayer: No DVR URL pattern matched, returning original');
   return url;
 };
 
@@ -716,6 +746,36 @@ const playerSettings = computed(() => {
     quickRewind: 10,
     quickForward: 10,
     forceHlsJSOnAppleDevices: true,
+    hlsJSConfig: {
+      // Handle media sequence mismatches and live stream errors
+      liveSyncDurationCount: 3,
+      liveMaxLatencyDurationCount: 10,
+      liveDurationInfinity: true,
+      maxBufferLength: 30,
+      maxMaxBufferLength: 600,
+      maxBufferSize: 60 * 1000 * 1000,
+      maxBufferHole: 0.5,
+      lowBufferWatchdogThreshold: 0.1,
+      highBufferWatchdogThreshold: 0.5,
+      nudgeOffset: 0.1,
+      nudgeMaxRetry: 3,
+      maxFragLookUpTolerance: 0.25,
+      liveBackBufferLength: 90,
+      // Error recovery settings
+      fragLoadTimeOut: 20000,
+      fragLoadingTimeOut: 20000,
+      fragLoadingMaxRetry: 6,
+      fragLoadRetry: 3,
+      manifestLoadTimeOut: 10000,
+      manifestLoadingMaxRetry: 6,
+      levelLoadingTimeOut: 10000,
+      levelLoadingMaxRetry: 4,
+      // Enable auto-level recovery
+      levelController: {
+        _manualLevel: -1,
+        _startLevel: undefined
+      }
+    },
     muxDataSettings: {
       debug: true,
       data: {
@@ -740,6 +800,47 @@ const playerSettings = computed(() => {
   if (posterUrl) settings.contentMetadata = { poster: [posterUrl] };
   return settings;
 });
+
+// Error recovery functions
+let retryCount = 0;
+const maxRetries = 3;
+
+function handleMediaSequenceMismatch() {
+  console.log('MediaPlayer: Handling media sequence mismatch...');
+  retryCount++;
+  
+  if (retryCount <= maxRetries) {
+    // Try to reload the player with the same URL
+    setTimeout(() => {
+      console.log(`MediaPlayer: Retry attempt ${retryCount}/${maxRetries}`);
+      const currentSrc = effectiveStreamingUrl.value;
+      if (currentSrc) {
+        rebuildPlayerWithSrc({ hls: currentSrc });
+      }
+    }, 2000 * retryCount); // Exponential backoff
+  } else {
+    console.warn('MediaPlayer: Max retries reached, trying fallback URL...');
+    handleHlsError();
+  }
+}
+
+function handleHlsError() {
+  console.log('MediaPlayer: Handling HLS error, trying fallback...');
+  
+  // Try to get a non-DVR version of the stream
+  const c = props.contentData || {};
+  const rawUrl = 
+    isEvent.value  ? (c.live_event_url || c.streaming_url) :
+    isSports.value ? (c.match_streaming_url || c.streaming_url) :
+                     c.streaming_url;
+  
+  if (rawUrl) {
+    console.log('MediaPlayer: Falling back to original stream URL');
+    rebuildPlayerWithSrc({ hls: rawUrl });
+  } else {
+    console.error('MediaPlayer: No fallback URL available');
+  }
+}
 
 async function rebuildPlayerWithSrc(srcObj) {
   const base = playerSettings.value || {};
@@ -775,20 +876,39 @@ async function rebuildPlayerWithSrc(srcObj) {
   const settings = { ...(playerSettings.value || {}), src: { hls: newKey } };
   try { rmpInstance.init(settings); } catch (initErr) { console.error('MediaPlayer: init failed', initErr); }
 
-  // If the player surfaces a 204 (RMP “no content”), switch to poster overlay
+  // Enhanced error handling for HLS issues
   try {
     rmpInstance.on?.('error', () => {
       try {
         const data = typeof rmpInstance.getErrorData === 'function' ? rmpInstance.getErrorData() : null;
+        console.error('MediaPlayer: Error received', data);
+        
+        // Handle 204 (no content) errors
         if ((data?.code === 204 || data?.code === '204') && isEvent.value) {
           pendingFromError.value = true;
-          // Tear down player so the template re-renders the poster-shell
           try { rmpInstance.stop?.(); } catch {}
           try { rmpInstance.destroy?.(); } catch {}
           rmpInstance = null;
           lastSrcKey.value = '';
+          return;
         }
-      } catch {}
+        
+        // Handle HLS media sequence mismatch errors
+        if (data?.message && data.message.includes('media sequence mismatch')) {
+          console.warn('MediaPlayer: Media sequence mismatch detected, attempting recovery...');
+          handleMediaSequenceMismatch();
+          return;
+        }
+        
+        // Handle other HLS/network errors
+        if (data?.code === 204 || data?.type === 'networkError' || data?.details === 'levelParsingError') {
+          console.warn('MediaPlayer: HLS/Network error, attempting fallback...');
+          handleHlsError();
+          return;
+        }
+      } catch (err) {
+        console.error('MediaPlayer: Error handler failed', err);
+      }
     });
   } catch {}
 
@@ -797,7 +917,15 @@ async function rebuildPlayerWithSrc(srcObj) {
 // hook common lifecycle events that change size
 try {
   const onOnce = (evt) => {
-    const h = () => { resync(); try { rmpInstance.off?.(evt, h); } catch {} };
+    const h = () => { 
+      resync(); 
+      // Reset retry count on successful events
+      if (evt === 'playing' || evt === 'ready') {
+        retryCount = 0;
+        console.log('MediaPlayer: Stream loaded successfully, retry count reset');
+      }
+      try { rmpInstance.off?.(evt, h); } catch {} 
+    };
     rmpInstance.on?.(evt, h);
   };
   ['ready', 'loadedmetadata', 'resize', 'playing'].forEach(onOnce);
@@ -925,6 +1053,132 @@ onMounted(() => {
   timeInterval = setInterval(() => { currentTime.value = Date.now(); }, 30000);
   syncPanelHeight();
   window.addEventListener('resize', syncPanelHeight, { passive: true });
+  
+  // Add keyboard controls for media player
+  const handlePlayerKeydown = (e) => {
+    if (!rmpInstance) return;
+    
+    // Only handle keys when player is focused or no input is focused
+    const activeElement = document.activeElement;
+    const playerContainer = document.getElementById('rmp-container');
+    
+    // Check if player or any part of player is focused
+    const isPlayerFocused = playerContainer && (
+      activeElement === playerContainer || 
+      activeElement?.closest('#rmp-container') ||
+      activeElement?.closest('.player-column') ||
+      activeElement?.classList?.contains('rmp-container')
+    );
+    
+    console.log('Player: Key pressed', e.key, 'Is player focused:', isPlayerFocused, 'Active element:', activeElement?.tagName, activeElement?.id);
+    
+    if (activeElement && (
+      activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.tagName === 'SELECT' ||
+      activeElement.getAttribute('contenteditable') === 'true'
+    )) {
+      return;
+    }
+    
+    // Handle navigation when player is focused
+    if (isPlayerFocused) {
+      switch (e.key) {
+        case 'ArrowUp':
+          // Go to hamburger menu
+          console.log('Player: Arrow Up - going to hamburger');
+          e.preventDefault();
+          const hamburgerEl = document.getElementById('menu_flat_icon');
+          if (hamburgerEl) {
+            hamburgerEl.focus();
+            hamburgerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          break;
+          
+        case 'ArrowDown':
+          // Go back to EPG
+          console.log('Player: Arrow Down - going to EPG');
+          e.preventDefault();
+          const epgEl = document.querySelector('.epg-container');
+          if (epgEl) {
+            epgEl.focus();
+            epgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          break;
+      }
+    }
+    
+    // Media controls (always work when player exists)
+    switch (e.key) {
+      case ' ':
+      case 'Space':
+        // Play/Pause
+        e.preventDefault();
+        if (typeof rmpInstance.play === 'function' && typeof rmpInstance.pause === 'function') {
+          if (rmpInstance.getPaused()) {
+            rmpInstance.play();
+          } else {
+            rmpInstance.pause();
+          }
+        }
+        break;
+        
+      case 'ArrowLeft':
+        // Rewind (10 seconds)
+        e.preventDefault();
+        if (typeof rmpInstance.seekTo === 'function') {
+          const currentTime = rmpInstance.getCurrentTime();
+          const newTime = Math.max(0, currentTime - 10);
+          rmpInstance.seekTo(newTime);
+        }
+        break;
+        
+      case 'ArrowRight':
+        // Forward (10 seconds)
+        e.preventDefault();
+        if (typeof rmpInstance.seekTo === 'function') {
+          const currentTime = rmpInstance.getCurrentTime();
+          const duration = rmpInstance.getDuration();
+          const newTime = Math.min(duration, currentTime + 10);
+          rmpInstance.seekTo(newTime);
+        }
+        break;
+        
+      case 'ArrowUp':
+        // Volume Up (only if not navigating)
+        if (!isPlayerFocused && typeof rmpInstance.setVolume === 'function') {
+          e.preventDefault();
+          const currentVolume = rmpInstance.getVolume();
+          const newVolume = Math.min(1, currentVolume + 0.1);
+          rmpInstance.setVolume(newVolume);
+        }
+        break;
+        
+      case 'ArrowDown':
+        // Volume Down (only if not navigating)
+        if (!isPlayerFocused && typeof rmpInstance.setVolume === 'function') {
+          e.preventDefault();
+          const currentVolume = rmpInstance.getVolume();
+          const newVolume = Math.max(0, currentVolume - 0.1);
+          rmpInstance.setVolume(newVolume);
+        }
+        break;
+        
+      case 'f':
+      case 'F':
+        // Fullscreen toggle
+        e.preventDefault();
+        if (typeof rmpInstance.setFullscreen === 'function') {
+          rmpInstance.setFullscreen(!rmpInstance.getFullscreen());
+        }
+        break;
+    }
+  };
+  
+  window.addEventListener('keydown', handlePlayerKeydown);
+  
+  // Store handler for cleanup
+  window._playerKeydownHandler = handlePlayerKeydown;
 });
 
 onBeforeUnmount(() => {
@@ -935,6 +1189,12 @@ onBeforeUnmount(() => {
   rmpInstance = null;
   if (timeInterval) clearInterval(timeInterval);
   window.removeEventListener('resize', syncPanelHeight);
+  
+  // Remove keyboard event listener
+  if (window._playerKeydownHandler) {
+    window.removeEventListener('keydown', window._playerKeydownHandler);
+    delete window._playerKeydownHandler;
+  }
 });
 
 // Reset info-panel lock whenever content truly changes

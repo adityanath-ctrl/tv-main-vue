@@ -12,7 +12,7 @@
           <template v-slot:activator="{ props }">
             <v-list-item
               v-bind="props"
-              class="mb-3 focusable-item"
+              class="mb-3 focusable-item navigation-item"
               :class="{ 'kb-focused': getFlatIndex(index, null) === focusedIndex }"
               :prepend-avatar="getIconUrl(menuItem)"
               :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
@@ -24,7 +24,7 @@
           <v-list-item
             v-for="(subItem, subIndex) in menuItem.sub_menu_items"
             :key="subItem.id"
-            class="custom-sub-menu-item focusable-item"
+            class="custom-sub-menu-item focusable-item navigation-item"
             :class="{ 'kb-focused': getFlatIndex(index, subIndex) === focusedIndex }"
             :prepend-avatar="getIconUrl(subItem, true)"
             :style="currentRoute == subItem.id ? activeItemStyle : inActiveItemStyle"
@@ -36,7 +36,7 @@
         <v-list-item
           v-else
           :key="menuItem.id + '_single'"
-          class="mb-3 focusable-item"
+          class="mb-3 focusable-item navigation-item"
           :class="{ 'kb-focused': getFlatIndex(index, null) === focusedIndex }"
           :prepend-avatar="getIconUrl(menuItem)"
           :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
@@ -94,6 +94,7 @@ import {
 import useNavigationStore from "@/store/useNavigationStore";
 import useMenuStore from "@/store/useMenuStore";
 import useAuthStore from '@/store/useAuthStore';
+// import { useFocusStore } from '@/store/useFocusStore';
 import ButtonFlowTemplate from '@/components/popups/btnFlowTemplate.vue';
 import { useMsal } from '@/composition-api/useMsal';
 import { useUIStore } from '@/store/useUIStore';
@@ -104,6 +105,7 @@ const menuStore = useMenuStore();
 const navigationStore = useNavigationStore();
 const { instance } = useMsal();
 const uiStore = useUIStore();
+// const focusStore = useFocusStore();
 
 const currentRoute = ref("");
 const isUserLoggedIn = computed(() => authStore.isUserLoggedIn);
@@ -157,10 +159,12 @@ const handleKeyDown = (e) => {
   e.preventDefault();
 
   if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-    focusedIndex.value = Math.min(focusedIndex.value + 1, total - 1);
+    const newIndex = Math.min(focusedIndex.value + 1, total - 1);
+    focusedIndex.value = newIndex;
 
   } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-    focusedIndex.value = Math.max(focusedIndex.value - 1, 0);
+    const newIndex = Math.max(focusedIndex.value - 1, 0);
+    focusedIndex.value = newIndex;
 
   } else if (e.key === 'Enter') {
     const item = flatItems.value[focusedIndex.value];

@@ -1,6 +1,6 @@
 <!-- /src/components/epg/index.vue -->
 <template>
-  <div @click="navigationStateChange()" class="outer-container">
+  <div @click="navigationStateChange()" class="outer-container epg-container" tabindex="0">
     <div class="top-container">
       <div id="epgPlayer" v-if="playerChannel" ref="epgPlayerRef">
         <MediaPlayer
@@ -466,14 +466,14 @@ export default {
     },
 
     handleKeyDown(e) {
+      console.log('EPG: Key pressed', e.key, 'Channel:', this.activeChannelIndex, 'Program:', this.activeProgramIndex);
+      
       if (this.hasNotStartedDialog) {
         if (e.key === 'Enter' || e.key === 'Escape') this.hasNotStartedDialog = false;
         return;
       }
-
+      
       const navigationStore = useNavigationStore();
-      if (navigationStore.getNavigationState) return;
-
       const channels = this.epgChannelListMapFiltered;
       if (!channels.length) return;
 
@@ -484,6 +484,12 @@ export default {
         if (this.activeProgramIndex < programs.length - 1) {
           this.activeProgramIndex++;
           this.scrollProgramIntoView();
+          e.preventDefault();
+          e.stopPropagation();
+        } else {
+          // Open Sidebar
+          console.log('EPG: Opening sidebar from leftmost position');
+          navigationStore.changeNavigationState(true);
           e.preventDefault();
           e.stopPropagation();
         }
@@ -505,6 +511,26 @@ export default {
           this.activeChannelIndex--;
           this.syncProgramIndexToTime(channels[this.activeChannelIndex], 'ArrowUp');
           this.scrollProgramIntoView();
+          e.preventDefault();
+          e.stopPropagation();
+        } else {
+          // At top channel - go to player or hamburger
+          console.log('EPG: At top channel, going up to player/hamburger');
+          if (this.playerChannel) {
+            // Focus the player
+            const playerEl = document.getElementById('epgPlayer');
+            if (playerEl) {
+              playerEl.focus();
+              playerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          } else {
+            // No player, go to hamburger
+            const hamburgerEl = document.getElementById('menu_flat_icon');
+            if (hamburgerEl) {
+              hamburgerEl.focus();
+              hamburgerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
           e.preventDefault();
           e.stopPropagation();
         }
@@ -559,7 +585,7 @@ export default {
 
     scrollProgramIntoView() {
       nextTick(() => {
-        const activeCard = this.$el.querySelector('.kb-focused');
+        const activeCard = document.querySelector('.kb-focused');
         if (activeCard) {
           activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }

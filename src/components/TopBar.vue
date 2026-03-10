@@ -8,8 +8,8 @@
     </router-link>
 
     <div class="d-flex justify-center justify-md-start align-items-center first-division">
-      <v-btn v-if="showHamburger" icon id="menu_flat_icon" class="mx-5 for-responsive pb-10"
-        @click="changeStateValue()">
+      <v-btn v-if="showHamburger" icon id="menu_flat_icon" class="mx-5 for-responsive pb-10 topbar-item"
+        @click="changeStateValue()" :class="{ 'kb-focused': isHamburgerFocused }">
         <v-icon size="40">mdi-menu</v-icon>
       </v-btn>
       <div v-else class="hamburger-spacer mx-5"></div>
@@ -111,6 +111,7 @@ import useNavigationStore from '@/store/useNavigationStore';
 import useMenuStore from '@/store/useMenuStore';
 import { jwtDecode } from 'jwt-decode';
 import SearchInput from './SearchInput.vue';
+// import { useGlobalKeyboardNavigation } from '@/composition-api/useGlobalKeyboardNavigation';
 
 
 const isDesktop = ref(true)
@@ -120,9 +121,44 @@ const updateIsDesktop = () => {
 onMounted(() => {
   updateIsDesktop();
   window.addEventListener('resize', updateIsDesktop);
+  checkToken();
+  
+  // Add keyboard handler for hamburger menu
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowDown' && isHamburgerFocused.value) {
+      // From hamburger go to player or EPG
+      e.preventDefault();
+      const playerEl = document.getElementById('rmp-container');
+      if (playerEl) {
+        console.log('Hamburger: Arrow Down - going to player');
+        playerEl.focus();
+        playerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        // No player, go to EPG
+        const epgEl = document.querySelector('.epg-container');
+        if (epgEl) {
+          console.log('Hamburger: Arrow Down - going to EPG');
+          epgEl.focus();
+          epgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+  };
+  
+  window.addEventListener('keydown', handleKeyDown);
+  
+  // Store for cleanup
+  window._hamburgerKeydownHandler = handleKeyDown;
 });
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateIsDesktop);
+  
+  // Remove keyboard handler
+  if (window._hamburgerKeydownHandler) {
+    window.removeEventListener('keydown', window._hamburgerKeydownHandler);
+    delete window._hamburgerKeydownHandler;
+  }
 });
 
 const route = useRoute();
@@ -131,6 +167,10 @@ const authStore = useAuthStore();
 const navigationStore = useNavigationStore();
 const accountStore = useAccountStore();
 const menuStore = useMenuStore();
+
+// Disable global navigation to restore original functionality
+// const { isHamburgerFocused } = useGlobalKeyboardNavigation();
+const isHamburgerFocused = ref(false);
 
 const isHovered = ref(false);
 const emit = defineEmits(['navigationChange', 'showModal']);
@@ -142,7 +182,6 @@ const userEmail = computed(() => accountStore.getAccount?.user_email || '');
 const authToken = computed(() => authStore.getToken);
 const urlObj = new URL(window.location.href);
 const hasDeviceIdInParams = urlObj.searchParams.has('device_id');
-
 const sideMenus = computed(() => menuStore.SideMenus);
 
 const handleLogoClick = (event) => {
@@ -173,10 +212,6 @@ const checkToken = () => {
   }
 }
 
-onMounted(() => {
-  checkToken()
-})
-
 watch(() => authToken.value, checkToken)
 
 const backgroundStyle = computed(() => (isScrolled.value ? 'background-color: #111111cc;' : 'background-color: transparent; box-shadow: 0px 0px 0px 0px;'))
@@ -191,23 +226,21 @@ const isLimitExceeded = computed(() => {
   return status === 429 || status === 403;
 });
 
-const shouldShowHeaderItems = computed(() => accountLoaded.value && !isLimitExceeded.value);
-
-const showHamburger = computed(() => shouldShowHeaderItems.value && !ONLY_MANAGE_ACCOUNT);
-const showSearch = computed(() => shouldShowHeaderItems.value && !ONLY_MANAGE_ACCOUNT && route.path !== '/search');
-
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 10
-}
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
-})
-onBeforeUnmount(() => {
-  window.removeEventListener('scroll', handleScroll);
-})
+const showHamburger = computed(() => {
+  // Show hamburger on mobile and desktop
+  return true;
+});
 
 const changeStateValue = () => {
-  navigationStore.changeNavigationState(!navigationStore.getNavigationState)
+  const currentState = navigationStore.getNavigationState;
+  navigationStore.changeNavigationState(!currentState);
+  // Focus hamburger when opening sidebar
+  if (!currentState) {
+    const hamburgerEl = document.getElementById('menu_flat_icon');
+    if (hamburgerEl) {
+      hamburgerEl.focus();
+    }
+  }
 }
 
 const handleMenuItemClick = (item) => {

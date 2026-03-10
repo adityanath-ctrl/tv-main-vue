@@ -1,0 +1,84 @@
+/* Global Keyboard Navigation Styles */
+
+/* Keyboard focus indicator */
+.kb-focused {
+  outline: 3px solid #FAD701 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(250, 215, 1, 0.3) !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Focusable elements */
+.focusable-card,
+.topbar-item,
+.navigation-item,
+.slider-button {
+  position: relative;
+}
+
+/* Focus indicators for different components */
+.focusable-card.kb-focused {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.topbar-item.kb-focused {
+  background-color: rgba(11, 16, 159, 0.3) !important;
+}
+
+.navigation-item.kb-focused {
+  background-color: rgba(11, 16, 159, 0.2) !important;
+}
+
+.slider-button.kb-focused {
+  background-color: rgba(250, 215, 1, 0.2) !important;
+}
+
+/* Smooth scrolling for keyboard navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide focus outline when using mouse */
+.focusable-card:focus-visible,
+.topbar-item:focus-visible,
+.navigation-item:focus-visible,
+.slider-button:focus-visible {
+  outline: none;
+}
+
+/* Show focus outline only for keyboard navigation */
+.focusable-card.kb-focused:focus-visible,
+.topbar-item.kb-focused:focus-visible,
+.navigation-item.kb-focused:focus-visible,
+.slider-button.kb-focused:focus-visible {
+  outline: 3px solid #FAD701 !important;
+  outline-offset: 2px !important;
+}
+
+/* EPG specific focus styles */
+.epg-channel.kb-focused,
+.epg-program.kb-focused {
+  background-color: rgba(250, 215, 1, 0.1) !important;
+  border: 2px solid #FAD701 !important;
+}
+
+/* Player controls focus */
+.player-control.kb-focused {
+  background-color: rgba(250, 215, 1, 0.2) !important;
+  border: 2px solid #FAD701 !important;
+}
+
+/* Modal focus styles */
+.v-dialog .kb-focused {
+  border: 2px solid #FAD701 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .kb-focused {
+    outline-width: 2px !important;
+    outline-offset: 1px !important;
+  }
+}

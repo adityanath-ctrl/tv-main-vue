@@ -46,10 +46,14 @@ import useAccountStore from './store/useAccountStore';
 import { useUIStore } from './store/useUIStore';
 import PackageStatus from './components/PackageStatus.vue';
 import LimitExceededPopup from './components/popups/limitExceededPopup.vue';
-import EnterCodeFlow from './components/EnterCodeFlow.vue'; 
+import EnterCodeFlow from './components/EnterCodeFlow.vue';
+// import { useGlobalKeyboardNavigation } from '@/composition-api/useGlobalKeyboardNavigation'; 
 import { useFocusStore } from './store/useFocusStore';
 
 const focusStore = useFocusStore();
+
+// Don't initialize global navigation here to prevent conflicts with existing systems
+// const {} = useGlobalKeyboardNavigation();
 
 const route = useRoute();
 const authStore = useAuthStore();
