@@ -28,10 +28,10 @@
     </swiper-slide>
 
     <template #button-prev>
-      <div @click="prevSlide" class="swiper-top-position swiper-button-prev"></div>
+      <div @click="prevSlide" class="swiper-top-position swiper-button-prev" data-tv-focusable></div>
     </template>
     <template #button-next>
-      <div @click="nextSlide" class="swiper-top-position swiper-button-next"></div>
+      <div @click="nextSlide" class="swiper-top-position swiper-button-next" data-tv-focusable></div>
     </template>
   </swiper>
 

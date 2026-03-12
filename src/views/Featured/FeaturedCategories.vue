@@ -26,6 +26,7 @@
             :class="['fcw text font-weight-bold', isMobile ? 'ml-2' : 'ml-10']"
             :style="viewMoreButtonStyle"
             @click="goToCategoryPage(category.menuCategoryIds || category.categoryName, category.menuContentType, category.menuType)"
+            data-tv-focusable
           >
             View All
           </div>

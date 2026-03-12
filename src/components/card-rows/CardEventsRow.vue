@@ -23,10 +23,10 @@
     </swiper-slide>
 
         <template #button-prev>
-      <div @click="swiperRef?.swiperInstance?.slidePrev()" class="swiper-top-position swiper-button-prev"></div>
+      <div @click="swiperRef?.swiperInstance?.slidePrev()" class="swiper-top-position swiper-button-prev" data-tv-focusable></div>
     </template>
     <template #button-next>
-      <div @click="swiperRef?.swiperInstance?.slideNext()" class="swiper-top-position swiper-button-next"></div>
+      <div @click="swiperRef?.swiperInstance?.slideNext()" class="swiper-top-position swiper-button-next" data-tv-focusable></div>
     </template>
   </swiper>
   <div v-else-if="isLoadingData && liveEvents.length === 0" class="loading-placeholder">

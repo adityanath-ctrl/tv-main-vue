@@ -9,7 +9,7 @@
 
     <div class="d-flex justify-center justify-md-start align-items-center first-division">
       <v-btn v-if="showHamburger" icon id="menu_flat_icon" class="mx-5 for-responsive pb-10"
-        @click="changeStateValue()">
+        @click="changeStateValue()" data-tv-focusable>
         <v-icon size="40">mdi-menu</v-icon>
       </v-btn>
       <div v-else class="hamburger-spacer mx-5"></div>
@@ -34,7 +34,7 @@
               borderRadius: '30px',
               backgroundColor: menu.isHovered ? HIGHLIGHT_COLOR_1 : 'transparent',
             }" v-if="(menu.item !== 'Broadcast') || (menu.item === 'Broadcast' && isUserLoggedIn)"
-            :disabled="hasDeviceIdInParams">
+            :disabled="hasDeviceIdInParams" data-tv-focusable>
             <img v-if="menu.icon !== ''" :src="menu.icon" class="mr-2"
               style="width: 20px; height: 20px; margin-right: 10px;" />
             {{ menu.item }}
@@ -51,7 +51,7 @@
                   fontSize: '16px',
                   fontWeight: '400',
                   borderRadius: '30px',
-                }" :disabled="hasDeviceIdInParams">
+                }" :disabled="hasDeviceIdInParams" data-tv-focusable>
                 <img v-if="item.icon !== ''" :src="item.icon" class="mr-2" style="width: 20px; height: 20px" />
                 {{ item.name }}
               </v-btn>
@@ -70,14 +70,14 @@
           fontWeight: '400',
           borderRadius: '30px',
           margin: '10px',
-        }" v-if="!isUserLoggedIn">
+        }" v-if="!isUserLoggedIn" data-tv-focusable>
         Sign In
       </v-btn>
 
       <v-menu :open-on-hover="isDesktop" v-if="isUserLoggedIn">
         <template v-slot:activator="{ props }">
           <v-btn v-bind="props" icon x-large class="top-bar-menu mx-5"
-            style="border-radius: 30px; background-color: #ffffff; color: #000; font-size: 20px;">
+            style="border-radius: 30px; background-color: #ffffff; color: #000; font-size: 20px;" data-tv-focusable>
             <v-icon x-large>mdi-account</v-icon>
           </v-btn>
         </template>
@@ -89,7 +89,7 @@
           </v-list-item>
           <v-list-item v-for="(item, index) in SignoutMenu[0].subItems" :key="index">
             <v-btn class="d-flex align-center top-bar-menu" @click="item.action && handleMenuItemClick(item)"
-              style="text-transform: capitalize; font-size: 16px; font-weight: 400;" :disabled="hasDeviceIdInParams">
+              style="text-transform: capitalize; font-size: 16px; font-weight: 400;" :disabled="hasDeviceIdInParams" data-tv-focusable>
               <v-list-item-title>{{ item.name }}</v-list-item-title>
             </v-btn>
           </v-list-item>

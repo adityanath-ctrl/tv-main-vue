@@ -15,7 +15,7 @@
           <!-- Inline access overlay (e.g., needsCode) -->
           <div v-if="showAccessMessage" class="access-overlay">
             <p class="access-message">{{ accessMessage }}</p>
-            <v-btn v-if="showGetAccessButton" outlined color="white" class="popup-btn" @click="triggerPremiumAccess">
+            <v-btn v-if="showGetAccessButton" outlined color="white" class="popup-btn" @click="triggerPremiumAccess" data-tv-focusable>
               Get Access
             </v-btn>
           </div>
@@ -35,12 +35,68 @@
         <!-- Real player only when there is a playable URL and no blocking overlay -->
         <div
           v-else
-          :key="playerKey"
-          id="rmp-container"
-          ref="rmpContainer"
-          :class="{ 'fill-viewport': fullscreenMode }"
-          :style="rmpViewportStyle"
+          class="player-wrapper"
+          @mouseenter="showPlayerControls"
+          @mousemove="showPlayerControls"
+          @mouseleave="hidePlayerControlsDelayed"
         >
+          <div
+            :key="playerKey"
+            id="rmp-container"
+            ref="rmpContainer"
+            :class="{ 'fill-viewport': fullscreenMode }"
+            :style="rmpViewportStyle"
+          >
+          </div>
+
+          <!-- TV-navigable player overlay controls -->
+          <div
+            class="player-tv-overlay"
+            :class="{ 'player-tv-overlay--visible': playerControlsVisible }"
+          >
+            <div class="player-tv-controls">
+              <button
+                class="player-tv-control"
+                data-tv-focusable
+                @click="onPlayerRewind"
+                title="Rewind 10s"
+              >
+                <v-icon size="28">mdi-rewind-10</v-icon>
+              </button>
+              <button
+                class="player-tv-control player-tv-control--main"
+                data-tv-focusable
+                @click="onPlayerPlayPause"
+                title="Play/Pause"
+              >
+                <v-icon size="40">{{ isPlayerPaused ? 'mdi-play' : 'mdi-pause' }}</v-icon>
+              </button>
+              <button
+                class="player-tv-control"
+                data-tv-focusable
+                @click="onPlayerForward"
+                title="Forward 10s"
+              >
+                <v-icon size="28">mdi-fast-forward-10</v-icon>
+              </button>
+              <button
+                class="player-tv-control"
+                data-tv-focusable
+                @click="onPlayerMute"
+                title="Mute/Unmute"
+              >
+                <v-icon size="24">{{ isPlayerMuted ? 'mdi-volume-off' : 'mdi-volume-high' }}</v-icon>
+              </button>
+              <button
+                class="player-tv-control"
+                data-tv-focusable
+                @click="onPlayerFullscreen"
+                title="Fullscreen"
+              >
+                <v-icon size="24">mdi-fullscreen</v-icon>
+              </button>
+            </div>
+          </div>
         </div>
       </v-col>
 
@@ -55,6 +111,7 @@
               stacked
               variant="flat"
               @click="activeTab = tab.id"
+              data-tv-focusable
             >
               <v-icon :icon="tab.icon"></v-icon>
               {{ tab.title }}
@@ -69,7 +126,7 @@
                 <div class="subtabs mb-3">
                   <v-slide-group v-model="activeSportsSubTab" show-arrows>
                     <v-slide-group-item v-for="s in sportsSubTabs" :key="s.id" :value="s.id">
-                      <v-btn class="mx-1" size="small" :color="activeSportsSubTab === s.id ? HIGHLIGHT_COLOR_1 : '#363636'" @click="onChangeSportsSubTab(s.id)">
+                      <v-btn class="mx-1" size="small" :color="activeSportsSubTab === s.id ? HIGHLIGHT_COLOR_1 : '#363636'" @click="onChangeSportsSubTab(s.id)" data-tv-focusable>
                         {{ s.title }}
                       </v-btn>
                     </v-slide-group-item>
@@ -186,7 +243,7 @@
                 <div class="subtabs mb-3">
                   <v-slide-group v-model="activeStreamGroup" show-arrows>
                     <v-slide-group-item v-for="(g, idx) in streamGroups" :key="g.id ?? idx" :value="idx">
-                      <v-btn class="mx-1" size="small" :color="idx === activeStreamGroup ? HIGHLIGHT_COLOR_1 : '#363636'">
+                      <v-btn class="mx-1" size="small" :color="idx === activeStreamGroup ? HIGHLIGHT_COLOR_1 : '#363636'" data-tv-focusable>
                         {{ g.title }}
                       </v-btn>
                     </v-slide-group-item>
@@ -200,6 +257,7 @@
                     class="list-row"
                     :class="{ 'is-active': isSelected(ev) }"
                     @click="emitSelectEvent(ev)"
+                    data-tv-focusable
                   >
                     <div class="row-thumb">
                       <v-img :src="ev.live_event_image || ev.live_event_image_wide" cover />
@@ -223,7 +281,7 @@
                 <div class="subtabs mb-3">
                   <v-slide-group v-model="activeVideoGroup" show-arrows>
                     <v-slide-group-item v-for="(g, idx) in videoGroups" :key="g.id ?? idx" :value="idx">
-                      <v-btn class="mx-1" size="small" :color="idx === activeVideoGroup ? HIGHLIGHT_COLOR_1 : '#363636'">
+                      <v-btn class="mx-1" size="small" :color="idx === activeVideoGroup ? HIGHLIGHT_COLOR_1 : '#363636'" data-tv-focusable>
                         {{ g.title }}
                       </v-btn>
                     </v-slide-group-item>
@@ -237,6 +295,7 @@
                     class="list-row"
                     :class="{ 'is-active': isSelected(ev) }"
                     @click="emitSelectEvent(ev)"
+                    data-tv-focusable
                   >
                     <div class="row-thumb">
                       <v-img :src="ev.live_event_image || ev.live_event_image_wide" cover />
@@ -271,8 +330,8 @@
         </v-card-title>
         <v-card-text class="popupSubHeading">{{ popupMessage }}</v-card-text>
         <v-card-actions class="d-flex justify-center align-center">
-          <v-btn outlined color="white" class="popup-btn" @click="closePopup">Cancel</v-btn>
-          <v-btn outlined color="white" class="popup-btn" @click="handleSignIn">Login</v-btn>
+          <v-btn outlined color="white" class="popup-btn" @click="closePopup" data-tv-focusable>Cancel</v-btn>
+          <v-btn outlined color="white" class="popup-btn" @click="handleSignIn" data-tv-focusable>Login</v-btn>
         </v-card-actions>
       </template>
 
@@ -285,8 +344,8 @@
           To access it, please click the "Continue" button and enter your access code or top-up code to unlock the content.
         </v-card-text>
         <v-card-actions class="d-flex justify-center align-center">
-          <v-btn outlined color="white" class="popup-btn" @click="closePopup">Cancel</v-btn>
-          <v-btn outlined color="white" class="popup-btn" @click="handleContinueToEnterCode">Continue</v-btn>
+          <v-btn outlined color="white" class="popup-btn" @click="closePopup" data-tv-focusable>Cancel</v-btn>
+          <v-btn outlined color="white" class="popup-btn" @click="handleContinueToEnterCode" data-tv-focusable>Continue</v-btn>
         </v-card-actions>
       </template>
     </ButtonFlowTemplate>
@@ -311,6 +370,91 @@ import { useUIStore } from '@/store/useUIStore';
 import ButtonFlowTemplate from '@/components/popups/btnFlowTemplate.vue';
 import { getUUID } from '@/utils/siberAPI';
 import StreamNotStarted from '@/assets/img/app-stream-not-started.jpg';
+
+/* ── Player overlay controls state ── */
+const playerControlsVisible = ref(false);
+const isPlayerPaused = ref(true);
+const isPlayerMuted = ref(false);
+let playerControlsTimer = null;
+
+function showPlayerControls() {
+  playerControlsVisible.value = true;
+  resetPlayerControlsTimer();
+}
+function hidePlayerControlsDelayed() {
+  resetPlayerControlsTimer();
+  playerControlsTimer = setTimeout(() => {
+    playerControlsVisible.value = false;
+  }, 3000);
+}
+function resetPlayerControlsTimer() {
+  if (playerControlsTimer) {
+    clearTimeout(playerControlsTimer);
+    playerControlsTimer = null;
+  }
+}
+
+function getVideoEl() {
+  const container = document.getElementById('rmp-container');
+  return container?.querySelector('video') || document.querySelector('video');
+}
+
+function syncPlayerState() {
+  const video = getVideoEl();
+  if (video) {
+    isPlayerPaused.value = video.paused;
+    isPlayerMuted.value = video.muted;
+  }
+}
+
+function onPlayerPlayPause() {
+  const video = getVideoEl();
+  if (video) {
+    if (video.paused) video.play();
+    else video.pause();
+    syncPlayerState();
+  }
+  showPlayerControls();
+}
+
+function onPlayerRewind() {
+  const video = getVideoEl();
+  if (video) {
+    video.currentTime = Math.max(0, video.currentTime - 10);
+  }
+  showPlayerControls();
+}
+
+function onPlayerForward() {
+  const video = getVideoEl();
+  if (video) {
+    video.currentTime = Math.min(video.duration - 1, video.currentTime + 10);
+  }
+  showPlayerControls();
+}
+
+function onPlayerMute() {
+  const video = getVideoEl();
+  if (video) {
+    video.muted = !video.muted;
+    syncPlayerState();
+  }
+  showPlayerControls();
+}
+
+function onPlayerFullscreen() {
+  const container = document.getElementById('rmp-container');
+  if (!container) return;
+  if (document.fullscreenElement) {
+    document.exitFullscreen?.();
+  } else {
+    container.requestFullscreen?.();
+  }
+  showPlayerControls();
+}
+
+// Poll video state periodically
+let playerPollInterval = null;
 
 const emit = defineEmits(['selectEvent']);
 
@@ -925,6 +1069,8 @@ onMounted(() => {
   timeInterval = setInterval(() => { currentTime.value = Date.now(); }, 30000);
   syncPanelHeight();
   window.addEventListener('resize', syncPanelHeight, { passive: true });
+  // Poll player state for TV controls
+  playerPollInterval = setInterval(syncPlayerState, 1000);
 });
 
 onBeforeUnmount(() => {
@@ -934,6 +1080,8 @@ onBeforeUnmount(() => {
   }
   rmpInstance = null;
   if (timeInterval) clearInterval(timeInterval);
+  if (playerPollInterval) clearInterval(playerPollInterval);
+  resetPlayerControlsTimer();
   window.removeEventListener('resize', syncPanelHeight);
 });
 
@@ -1259,5 +1407,87 @@ defineExpose({ playLiveNow, dvrSeekToEpoch, playPastProgram });
 @media (min-width: 2560px) {
   .pending-text { font-size: clamp(1.5rem, 0.9vw + 1.2rem, 3rem); }
   .pending-date { font-size: clamp(1.25rem, 0.8vw + 1.1rem, 2.2rem); }
+}
+
+/* ── Player wrapper & TV overlay controls ─────────────── */
+.player-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.player-tv-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 24px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  z-index: 20;
+  border-radius: 0 0 14px 14px;
+}
+
+.player-tv-overlay--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.player-tv-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.player-tv-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.player-tv-control:hover {
+  background: rgba(39, 170, 225, 0.4);
+  border-color: #27AAE1;
+  transform: scale(1.1);
+}
+
+.player-tv-control--main {
+  width: 64px;
+  height: 64px;
+  border-width: 3px;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(39, 170, 225, 0.25);
+}
+
+.player-tv-control--main:hover {
+  background: rgba(39, 170, 225, 0.6);
+}
+
+/* TV focus override for player controls */
+.player-tv-control.tv-focused {
+  background: rgba(39, 170, 225, 0.6) !important;
+  border-color: #27AAE1 !important;
+  transform: scale(1.15) !important;
+  box-shadow: 0 0 20px rgba(39, 170, 225, 0.7) !important;
+  outline: none !important;
+}
+
+@media (max-width: 600px) {
+  .player-tv-controls { gap: 10px; }
+  .player-tv-control { width: 40px; height: 40px; }
+  .player-tv-control--main { width: 52px; height: 52px; }
 }
 </style>

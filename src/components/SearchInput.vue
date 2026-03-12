@@ -1,7 +1,7 @@
 <template>
   <div class="search-container" :class="{ expanded: alwaysExpanded }">
     <input type="text" v-model="searchQuery" placeholder="Search" @input="onSearch"
-      :style="{ height: alwaysExpanded ? '40px' : '36px' }" @keyup.enter="performSearch" />
+      :style="{ height: alwaysExpanded ? '40px' : '36px' }" @keyup.enter="performSearch" data-tv-focusable />
     <v-icon v-if="searchQuery && alwaysExpanded" class="close-icon" size="20" @click="clearSearch">
       mdi-close
     </v-icon>

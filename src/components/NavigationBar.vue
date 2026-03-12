@@ -12,7 +12,7 @@
           <template v-slot:activator="{ props }">
             <v-list-item v-bind="props" :prepend-avatar="getIconUrl(menuItem)" class="mb-3"
               :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
-              @click="onClickParentMenu(index, menuItem, true)" :title="menuItem?.menuItemName">
+              @click="onClickParentMenu(index, menuItem, true)" :title="menuItem?.menuItemName" data-tv-focusable>
             </v-list-item>
           </template>
 
@@ -20,13 +20,13 @@
             :prepend-avatar="getIconUrl(subItem, true)"
             :style="currentRoute == subItem.id ? activeItemStyle : inActiveItemStyle"
             @click="onClickSubMenu(index, subIndex, subItem)" :title="subItem?.subMenuName"
-            class="custom-sub-menu-item">
+            class="custom-sub-menu-item" data-tv-focusable>
           </v-list-item>
         </v-list-group>
 
         <v-list-item v-else :key="menuItem.id + '_single'" :prepend-avatar="getIconUrl(menuItem)" class="mb-3"
           :style="currentRoute == menuItem.id ? activeItemStyle : inActiveItemStyle"
-          @click="onClickParentMenu(index, menuItem, false)">
+          @click="onClickParentMenu(index, menuItem, false)" data-tv-focusable>
           <v-list-item-title>
             {{ (!isUserLoggedIn && menuItem.menuItemLayout === 'Log_Out') ? 'Sign In' : menuItem.menuItemName }}
           </v-list-item-title>

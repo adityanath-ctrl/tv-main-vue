@@ -1,12 +1,13 @@
 <!-- /src/App.vue -->
 <template>
-  <v-layout @click="bodyClick()" :style="backgroundStyle">
-    <TopBar v-if="!shouldHideTopBar" class="py-3" @showModal="onShowModal" @navigationChange="changeNavigationState" />
-    <v-main style="--v-layout-left: 0px; --v-layout-top: 0px">
-      <NavigationBar v-if="showGlobalNav" />
-      <router-view :key="routeFullPath"></router-view>
-      <PackagesModal v-if="isShowPackageModal" @disabledDialog="onDisabledDialog"> </PackagesModal>
-    </v-main>
+  <TVNavigationProvider>
+    <v-layout @click="bodyClick()" :style="backgroundStyle">
+      <TopBar v-if="!shouldHideTopBar" class="py-3" @showModal="onShowModal" @navigationChange="changeNavigationState" />
+      <v-main style="--v-layout-left: 0px; --v-layout-top: 0px">
+        <NavigationBar v-if="showGlobalNav" />
+        <router-view :key="routeFullPath"></router-view>
+        <PackagesModal v-if="isShowPackageModal" @disabledDialog="onDisabledDialog"> </PackagesModal>
+      </v-main>
 
     <v-dialog v-model="isPackageStatusPopupVisible" persistent max-width="800px" scrollable>
       <v-card style="background-color: #1f1f1f; color: white; border-radius: 15px;">
@@ -31,7 +32,13 @@
 
     <LimitExceededPopup :closePopup="closeLimitExceededPopup" :dialog="limitExceededPopupState"
       v-if="shouldShowLimitExceededPopup" />
+
+    <!-- TV Navigation Hint -->
+    <div class="tv-navigation-hint">
+      <span>TV Remote: <span class="key">↑↓←→</span> Navigate | <span class="key">Enter</span> Select</span>
+    </div>
   </v-layout>
+  </TVNavigationProvider>
 </template>
 
 <script setup>
@@ -40,6 +47,7 @@ import { useRoute } from 'vue-router';
 import NavigationBar from './components/NavigationBar.vue';
 import TopBar from './components/TopBar.vue';
 import PackagesModal from './components/PackagesModal.vue';
+import TVNavigationProvider from './components/TVNavigationProvider.vue';
 import { BACKGROUND_COLOR_1, SITE_TITLE, HIGHLIGHT_COLOR_1, ONLY_MANAGE_ACCOUNT } from '@/mainConfig';
 import useAuthStore from './store/useAuthStore';
 import useAccountStore from './store/useAccountStore';

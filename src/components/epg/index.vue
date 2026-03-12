@@ -30,6 +30,7 @@
           hide-details
           class="epg-channel-select"
           :menu-props="{ contentClass: 'epg-dropdown-menu' }"
+          data-tv-focusable
         />
       </div>
     </div>
@@ -92,6 +93,7 @@
               backgroundColor: BACKGROUND_COLOR_1
             }"
             @click="playCurrentProgramByChannelId(item.channel.id)"
+            data-tv-focusable
           >
             <div class="channel-logo-container">
               <img
@@ -135,6 +137,7 @@
                       left: `${getProgramLeft(program)}px`
                     }"
                     @click="playProgram(item, program)"
+                    data-tv-focusable
                   >
                     <div v-if="program.icon_poster && getProgramWidth(program) > 150" style="height: 80%; width: 80px; margin-right: 5px;">
                       <img :src="program.icon_poster" width="100%" height="100%" style="object-fit: contain;" :alt="program.progName" />
@@ -159,7 +162,7 @@
       <v-card-text>{{ clickedProgramForDialog?.progName }} has not started</v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn :style="ButtonColor" variant="text" @click="hasNotStartedDialog = false">Ok</v-btn>
+        <v-btn :style="ButtonColor" variant="text" @click="hasNotStartedDialog = false" data-tv-focusable>Ok</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

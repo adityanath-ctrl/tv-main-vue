@@ -11,11 +11,11 @@
             </v-card-text>
             <div class="input-container">
               <input type="text" v-model="enteredCodeInput" class="custom-input" placeholder="Enter code"
-                @keyup.enter="handleCheckCode" />
+                @keyup.enter="handleCheckCode" data-tv-focusable />
             </div>
             <div class="btn-flex">
-              <v-btn v-if="showCancelButton" class="popup-btn" @click="$emit('close')">Cancel</v-btn>
-              <v-btn class="popup-btn" @click="handleCheckCode" :disabled="isLoading">
+              <v-btn v-if="showCancelButton" class="popup-btn" @click="$emit('close')" data-tv-focusable>Cancel</v-btn>
+              <v-btn class="popup-btn" @click="handleCheckCode" :disabled="isLoading" data-tv-focusable>
                 <v-progress-circular v-if="isLoading" indeterminate size="20" class="mr-2"></v-progress-circular>
                 Enter
               </v-btn>
@@ -38,7 +38,7 @@
                 {{ alertMessage }}
               </v-card-text>
               <div class="btn-flex">
-                <v-btn class="popup-btn" @click="resetToStep1">OK</v-btn>
+                <v-btn class="popup-btn" @click="resetToStep1" data-tv-focusable>OK</v-btn>
               </div>
             </template>
             <!-- Confirmation Message -->
@@ -54,12 +54,12 @@
               </v-card-text>
               <v-card-text class="text-small">
                 You entered: <strong>{{ enteredCodeInput }}</strong><br />
-                <span class="valid-yellow-text see-details" @click="showPackageDetails = true">See code details</span>
+                <span class="valid-yellow-text see-details" @click="showPackageDetails = true" data-tv-focusable>See code details</span>
               </v-card-text>
               <v-card-text class="text-small">Do you want to redeem this code?</v-card-text>
               <div class="btn-flex">
-                <v-btn class="popup-btn" @click="resetToStep1">Cancel</v-btn>
-                <v-btn class="popup-btn" @click="handleRedeemCode" :disabled="isLoading">
+                <v-btn class="popup-btn" @click="resetToStep1" data-tv-focusable>Cancel</v-btn>
+                <v-btn class="popup-btn" @click="handleRedeemCode" :disabled="isLoading" data-tv-focusable>
                   <v-progress-circular v-if="isLoading" indeterminate size="20" class="mr-2"></v-progress-circular>
                   Redeem
                 </v-btn>
@@ -80,7 +80,7 @@
               Your access is valid until {{ formatDate(redeemCodeData.expiry_date) }}.
             </v-card-text>
             <div class="btn-flex">
-              <v-btn class="popup-btn" @click="handleSuccessAndReload">Ok</v-btn>
+              <v-btn class="popup-btn" @click="handleSuccessAndReload" data-tv-focusable>Ok</v-btn>
             </div>
           </div>
         </v-card>
@@ -91,7 +91,7 @@
     <transition name="fade">
       <div v-if="showPackageDetails" class="package-details-overlay" @click.self="showPackageDetails = false">
         <div class="package-details-content">
-          <button class="close-btn" @click="showPackageDetails = false">
+          <button class="close-btn" @click="showPackageDetails = false" data-tv-focusable>
             <span>×</span>
           </button>
           <h2 class="package-details-title">Package Details</h2>

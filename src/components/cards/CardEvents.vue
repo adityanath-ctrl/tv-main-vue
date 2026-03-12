@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column bg-none live-event w-100" :class="[isViewMore ? 'py-3' : 'pb-10 pt-2']"
-    @click="handleCardClick()" style="cursor: pointer">
+    @click="handleCardClick()" data-tv-focusable style="cursor: pointer">
     <div class="slider-img-container">
       <img :src="item.live_event_image_wide" class="card-top-img event-vod-img" />
       <img v-if="!item.package_status" :src="PremiumRibbonIcon" class="premium-ribbon" />

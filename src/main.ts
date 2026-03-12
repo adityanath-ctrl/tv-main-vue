@@ -13,6 +13,7 @@ import { EventType, type AuthenticationResult } from '@azure/msal-browser';
 import { CustomNavigationClient } from './router/NavigationClient';
 import useAuthStore from './store/useAuthStore';
 import { changeTimeFormatEST } from './utils/date';
+import { vTVFocusable } from './directives/vTVFocusable';
 
 // ——— GLOBAL SWIPER SETUP ———
 import Swiper from 'swiper';
@@ -63,6 +64,7 @@ const authStore = useAuthStore();
 app.use(vuetify);
 app.use(router);
 app.use(msalPlugin, msalInstance);
+app.directive('tv-focusable', vTVFocusable);
 
 async function initializeAppAuthentication() {
   authStore.setMsalInstance(msalInstance);

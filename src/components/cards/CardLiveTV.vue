@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column bg-none w-100" :class="[isViewMore ? 'py-3' : 'pb-10 pt-2']" @click="handleCardClick()"
-    style="cursor: pointer">
+    style="cursor: pointer" data-tv-focusable>
     <div class="slider-img-container">
       <img class="card-img" :src="EPG.icon_poster" />
       <img v-if="!item.package_status" :src="PremiumRibbonIcon" class="premium-ribbon" />
@@ -36,10 +36,10 @@
           {{ popupMessage }}
         </v-card-text>
         <v-card-actions class="d-flex justify-center align-center">
-          <v-btn outlined color="white" class="popup-btn" @click="closePopup">
+          <v-btn outlined color="white" class="popup-btn" @click="closePopup" data-tv-focusable>
             Cancel
           </v-btn>
-          <v-btn outlined color="white" class="popup-btn" @click="handleSignIn">
+          <v-btn outlined color="white" class="popup-btn" @click="handleSignIn" data-tv-focusable>
             Login
           </v-btn>
         </v-card-actions>
@@ -54,10 +54,10 @@
           To access it, please click the "Continue" button and enter your access code or top-up code to unlock the content.
         </v-card-text>
         <v-card-actions class="d-flex justify-center align-center">
-          <v-btn outlined color="white" class="popup-btn" @click="closePopup">
+          <v-btn outlined color="white" class="popup-btn" @click="closePopup" data-tv-focusable>
             Cancel
           </v-btn>
-          <v-btn outlined color="white" class="popup-btn" @click="handleContinueToEnterCode">
+          <v-btn outlined color="white" class="popup-btn" @click="handleContinueToEnterCode" data-tv-focusable>
             Continue
           </v-btn>
         </v-card-actions>

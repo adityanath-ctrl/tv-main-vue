@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="player-header" ref="headerRef">
       <div class="header-content">
-        <v-btn icon variant="plain" class="back-button" @click="goBack">
+        <v-btn icon variant="plain" class="back-button" @click="goBack" data-tv-focusable>
           <v-icon size="x-large">mdi-arrow-left</v-icon>
         </v-btn>
         <h1 class="movie-title">
@@ -20,8 +20,26 @@
     </div>
 
     <!-- Player viewport (16:9 box) -->
-    <div v-else-if="selectedEpisode" class="viewport" :style="viewportStyle">
+    <div v-else-if="selectedEpisode" class="viewport" :style="viewportStyle"
+      @mouseenter="showOverlay" @mousemove="showOverlay" @mouseleave="hideOverlayDelayed">
       <div id="movie-rmp"></div>
+      <!-- TV-navigable player overlay controls -->
+      <div class="player-tv-overlay" :class="{ 'player-tv-overlay--visible': overlayVisible }">
+        <div class="player-tv-controls">
+          <button class="player-tv-control" data-tv-focusable @click="doRewind" title="Rewind 10s">
+            <v-icon size="28">mdi-rewind-10</v-icon>
+          </button>
+          <button class="player-tv-control player-tv-control--main" data-tv-focusable @click="doPlayPause" title="Play/Pause">
+            <v-icon size="40">{{ videoPaused ? 'mdi-play' : 'mdi-pause' }}</v-icon>
+          </button>
+          <button class="player-tv-control" data-tv-focusable @click="doForward" title="Forward 10s">
+            <v-icon size="28">mdi-fast-forward-10</v-icon>
+          </button>
+          <button class="player-tv-control" data-tv-focusable @click="doMute" title="Mute/Unmute">
+            <v-icon size="24">{{ videoMuted ? 'mdi-volume-off' : 'mdi-volume-high' }}</v-icon>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Error -->
@@ -34,6 +52,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { usePlayerNavigation } from '@/composables/usePlayerNavigation';
 import useSVODStore from '@/store/useSVODStore';
 import useAuthStore from '@/store/useAuthStore';
 import {
@@ -53,6 +72,37 @@ const authStore = useAuthStore();
 const seriesId = ref(route.params.seriesId || route.params.id);
 const episodeId = ref(route.params.episodeId || route.query.episode);
 const loading = ref(true);
+
+/* ── TV overlay controls ── */
+const overlayVisible = ref(false);
+const videoPaused = ref(true);
+const videoMuted = ref(false);
+let overlayTimer = null;
+let statePollTimer = null;
+
+function showOverlay() {
+  overlayVisible.value = true;
+  if (overlayTimer) clearTimeout(overlayTimer);
+  overlayTimer = setTimeout(() => { overlayVisible.value = false; }, 4000);
+}
+function hideOverlayDelayed() {
+  if (overlayTimer) clearTimeout(overlayTimer);
+  overlayTimer = setTimeout(() => { overlayVisible.value = false; }, 2000);
+}
+function getVid() { return document.querySelector('#movie-rmp video'); }
+function syncVidState() { const v = getVid(); if (v) { videoPaused.value = v.paused; videoMuted.value = v.muted; } }
+function doPlayPause() { const v = getVid(); if (v) { v.paused ? v.play() : v.pause(); syncVidState(); } showOverlay(); }
+function doRewind() { const v = getVid(); if (v) v.currentTime = Math.max(0, v.currentTime - 10); showOverlay(); }
+function doForward() { const v = getVid(); if (v) v.currentTime = Math.min(v.duration - 1, v.currentTime + 10); showOverlay(); }
+function doMute() { const v = getVid(); if (v) { v.muted = !v.muted; syncVidState(); } showOverlay(); }
+
+const playerNav = usePlayerNavigation({
+  getPlayer: () => rmp,
+  onBack: () => goBack(),
+  containerSelector: '#movie-rmp',
+  seekStep: 10,
+  autoHideMs: 4000
+});
 
 watch(() => route.fullPath, () => {
   seriesId.value = route.params.seriesId || route.params.id;
@@ -438,6 +488,9 @@ onMounted(async () => {
   window.addEventListener('pagehide', onPageHide);
   window.addEventListener('beforeunload', onPageHide);
   await loadSeries();
+  // Enable player keyboard nav
+  playerNav.enable();
+  statePollTimer = setInterval(syncVidState, 1000);
 });
 
 // React to query changes (ms preferred)
@@ -486,6 +539,9 @@ onBeforeUnmount(() => {
   sendStopWatching({ reason: 'unmount', keepalive: true });
   window.removeEventListener('pagehide', onPageHide);
   window.removeEventListener('beforeunload', onPageHide);
+  playerNav.disable();
+  if (overlayTimer) clearTimeout(overlayTimer);
+  if (statePollTimer) clearInterval(statePollTimer);
   if (rmp) { try { rmp.stop?.(); } catch {} try { rmp.destroy?.(); } catch {} }
   rmp = null;
 });
@@ -558,5 +614,65 @@ const goBack = async () => {
 .player-loader,
 .player-error {
   color: #fff;
+}
+
+/* ── Player TV overlay controls ─────────────────────── */
+.player-tv-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 24px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  z-index: 20;
+}
+.player-tv-overlay--visible { opacity: 1; pointer-events: auto; }
+
+.player-tv-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.player-tv-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+.player-tv-control:hover {
+  background: rgba(39, 170, 225, 0.4);
+  border-color: #27AAE1;
+  transform: scale(1.1);
+}
+.player-tv-control--main {
+  width: 68px;
+  height: 68px;
+  border-width: 3px;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(39, 170, 225, 0.25);
+}
+.player-tv-control--main:hover { background: rgba(39, 170, 225, 0.6); }
+
+.player-tv-control.tv-focused {
+  background: rgba(39, 170, 225, 0.6) !important;
+  border-color: #27AAE1 !important;
+  transform: scale(1.15) !important;
+  box-shadow: 0 0 20px rgba(39, 170, 225, 0.7) !important;
+  outline: none !important;
 }
 </style>
